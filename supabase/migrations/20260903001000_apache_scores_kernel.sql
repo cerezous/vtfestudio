@@ -1,0 +1,2 @@
+-- Applied remotely via MCP as apache_scores_kernel.
+-- Table public.apache_scores + RPC public.upsert_apache_score / delete_apache_score.
