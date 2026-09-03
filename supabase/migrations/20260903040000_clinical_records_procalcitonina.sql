@@ -1,0 +1,2 @@
+-- Applied remotely via MCP as clinical_records_procalcitonina.
+-- Columna public.clinical_records.procalcitonina + RPC upsert_clinical_record.

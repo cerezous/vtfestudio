@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +12,7 @@ import {
   supportNeedsVmni,
   type SupportId,
 } from "@/modules/registros/constants";
+import { GipiPasteButtons } from "@/modules/registros/components/gipi-paste-buttons";
 import { computePafi, parseOptionalNumber } from "@/modules/registros/model";
 import {
   recordFormSchema,
@@ -59,7 +60,7 @@ function NumberField({
   hint?: string;
   error?: string;
   className?: string;
-} & React.ComponentProps<typeof Input>) {
+} & ComponentProps<typeof Input>) {
   return (
     <Field label={label} hint={hint} error={error} className={className}>
       <Input
@@ -209,9 +210,12 @@ export function RegistrosForm({
       </section>
 
       <section className="space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Sección exámenes
-        </p>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Sección exámenes
+          </p>
+          <GipiPasteButtons form={form} />
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <NumberField
             label="PaO₂ · mmHg"
@@ -232,6 +236,21 @@ export function RegistrosForm({
             label="EB · mEq/L"
             error={form.formState.errors.eb?.message}
             {...form.register("eb")}
+          />
+          <NumberField
+            label="PCR · mg/L"
+            error={form.formState.errors.pcr?.message}
+            {...form.register("pcr")}
+          />
+          <NumberField
+            label="Ác. láctico · mmol/L"
+            error={form.formState.errors.lactato?.message}
+            {...form.register("lactato")}
+          />
+          <NumberField
+            label="Procalcitonina · ng/mL"
+            error={form.formState.errors.procalcitonina?.message}
+            {...form.register("procalcitonina")}
           />
           <Field label="PaFi" hint="PaO₂ / FiO₂">
             <Input

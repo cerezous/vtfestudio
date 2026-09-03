@@ -1,4 +1,5 @@
 import { StudyDashboard } from "@/modules/dashboard/components/study-dashboard";
+import { getDashboardSnapshot } from "@/modules/dashboard/server";
 import { requireStaffSession } from "@/modules/auth/session";
 
 export const metadata = {
@@ -6,7 +7,10 @@ export const metadata = {
 };
 
 export default async function DashboardPage() {
-  const session = await requireStaffSession();
+  const [session, snapshot] = await Promise.all([
+    requireStaffSession(),
+    getDashboardSnapshot(),
+  ]);
 
-  return <StudyDashboard profile={session.profile} />;
+  return <StudyDashboard profile={session.profile} snapshot={snapshot} />;
 }

@@ -107,6 +107,95 @@ export type Database = {
           },
         ];
       };
+      clinical_records: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          driving_pressure: number | null;
+          eb: number | null;
+          epap: number | null;
+          fio2: number;
+          flujo: number | null;
+          hco3: number | null;
+          id: string;
+          iox: number | null;
+          lactato: number | null;
+          paco2: number | null;
+          pafi: number | null;
+          pao2: number | null;
+          patient_id: string;
+          pcr: number | null;
+          peep: number | null;
+          pmva: number | null;
+          procalcitonina: number | null;
+          ps: number | null;
+          recorded_at: string;
+          support: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          driving_pressure?: number | null;
+          eb?: number | null;
+          epap?: number | null;
+          fio2: number;
+          flujo?: number | null;
+          hco3?: number | null;
+          id?: string;
+          iox?: number | null;
+          lactato?: number | null;
+          paco2?: number | null;
+          pafi?: number | null;
+          pao2?: number | null;
+          patient_id: string;
+          pcr?: number | null;
+          peep?: number | null;
+          pmva?: number | null;
+          procalcitonina?: number | null;
+          ps?: number | null;
+          recorded_at: string;
+          support: string;
+          updated_at?: string;
+        };
+        Update: {
+          driving_pressure?: number | null;
+          eb?: number | null;
+          epap?: number | null;
+          fio2?: number;
+          flujo?: number | null;
+          hco3?: number | null;
+          iox?: number | null;
+          lactato?: number | null;
+          paco2?: number | null;
+          pafi?: number | null;
+          pao2?: number | null;
+          pcr?: number | null;
+          peep?: number | null;
+          pmva?: number | null;
+          procalcitonina?: number | null;
+          ps?: number | null;
+          recorded_at?: string;
+          support?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "clinical_records_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "clinical_records_patient_id_fkey";
+            columns: ["patient_id"];
+            isOneToOne: false;
+            referencedRelation: "patients";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       apache_scores: {
         Row: {
           age_points: number;
@@ -152,6 +241,61 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "apache_scores_patient_id_fkey";
+            columns: ["patient_id"];
+            isOneToOne: false;
+            referencedRelation: "patients";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      vmi_episodes: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          fecha_extubacion: string | null;
+          fecha_iot: string;
+          id: string;
+          intubacion_dificil: boolean;
+          lugar_iot: string | null;
+          motivo_otro: string | null;
+          motivo_vmi: string;
+          observaciones: string | null;
+          patient_id: string;
+          reintubacion: boolean;
+          updated_at: string;
+          via_aerea: string;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          fecha_extubacion?: string | null;
+          fecha_iot: string;
+          id?: string;
+          intubacion_dificil?: boolean;
+          lugar_iot?: string | null;
+          motivo_otro?: string | null;
+          motivo_vmi: string;
+          observaciones?: string | null;
+          patient_id: string;
+          reintubacion?: boolean;
+          updated_at?: string;
+          via_aerea: string;
+        };
+        Update: {
+          fecha_extubacion?: string | null;
+          fecha_iot?: string;
+          intubacion_dificil?: boolean;
+          lugar_iot?: string | null;
+          motivo_otro?: string | null;
+          motivo_vmi?: string;
+          observaciones?: string | null;
+          reintubacion?: boolean;
+          updated_at?: string;
+          via_aerea?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "vmi_episodes_patient_id_fkey";
             columns: ["patient_id"];
             isOneToOne: false;
             referencedRelation: "patients";
@@ -208,6 +352,16 @@ export type Database = {
         Returns: Database["public"]["Tables"]["apache_scores"]["Row"];
       };
       delete_apache_score: { Args: { p_id: string }; Returns: undefined };
+      upsert_clinical_record: {
+        Args: { p_id: string | null; p_payload: Json };
+        Returns: Database["public"]["Tables"]["clinical_records"]["Row"];
+      };
+      delete_clinical_record: { Args: { p_id: string }; Returns: undefined };
+      upsert_vmi_episode: {
+        Args: { p_id: string | null; p_payload: Json };
+        Returns: Database["public"]["Tables"]["vmi_episodes"]["Row"];
+      };
+      delete_vmi_episode: { Args: { p_id: string }; Returns: undefined };
     };
     Enums: {
       [_ in never]: never;
@@ -254,5 +408,7 @@ export type Tables<
 export type Profile = Tables<"profiles">;
 export type Patient = Tables<"patients">;
 export type ApacheScore = Tables<"apache_scores">;
+export type ClinicalRecord = Tables<"clinical_records">;
+export type VmiEpisode = Tables<"vmi_episodes">;
 export type PatientStatus = "hospitalized" | "not_hospitalized" | "deceased";
 export type StaffRole = "admin" | "investigator" | "coordinator" | "staff";

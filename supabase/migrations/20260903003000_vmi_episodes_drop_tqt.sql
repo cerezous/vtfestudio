@@ -1,0 +1,2 @@
+-- Applied remotely via MCP as vmi_episodes_drop_tqt.
+-- Drops fecha_tqt and forces via_aerea = TOT.

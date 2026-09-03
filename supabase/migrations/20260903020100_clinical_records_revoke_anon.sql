@@ -1,0 +1,3 @@
+-- Applied remotely via MCP as clinical_records_revoke_anon.
+-- Revoke EXECUTE from anon on upsert/delete_clinical_record.
+-- Index clinical_records_created_by_idx.

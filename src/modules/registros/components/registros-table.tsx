@@ -157,12 +157,15 @@ function GroupRows({
   return (
     <>
       <tr className="border-b bg-muted/30">
-        <th
-          colSpan={MAX_CLINICAL_RECORDS + 1}
-          className="sticky left-0 px-3 py-1.5 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
-        >
+        <th className="sticky left-0 z-10 bg-muted/30 px-3 py-1.5 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           {title}
         </th>
+        {slots.map((record, index) => (
+          <td
+            key={record?.id ?? `${title}-empty-${index}`}
+            className="border-l bg-muted/30 px-1.5 py-1.5"
+          />
+        ))}
       </tr>
       {rows.map((row) => (
         <tr key={row.id} className="border-b last:border-0">

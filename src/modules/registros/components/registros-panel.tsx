@@ -2,8 +2,15 @@
 
 import { useState } from "react";
 
+import { toast } from "sonner";
+
+import { RegistrosChart } from "@/modules/registros/components/registros-chart";
 import { RegistrosDialog } from "@/modules/registros/components/registros-dialog";
 import { RegistrosTable } from "@/modules/registros/components/registros-table";
+import {
+  RegistrosViewSwitch,
+  type RegistrosView,
+} from "@/modules/registros/components/registros-view-switch";
 import { MAX_CLINICAL_RECORDS } from "@/modules/registros/constants";
 import {
   useClinicalRecords,
@@ -27,6 +34,7 @@ export function RegistrosPanel({ patient }: { patient: Patient }) {
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<ClinicalRecord | null>(null);
   const [removing, setRemoving] = useState<ClinicalRecord | null>(null);
+  const [view, setView] = useState<RegistrosView>("tabla");
   const records = data ?? [];
   const atLimit = records.length >= MAX_CLINICAL_RECORDS;
 
@@ -40,6 +48,7 @@ export function RegistrosPanel({ patient }: { patient: Patient }) {
 
   function openCreate() {
     if (atLimit) {
+      toast.error(`Este paciente ya tiene ${MAX_CLINICAL_RECORDS} registros.`);
       return;
     }
     setCreating(true);
@@ -56,16 +65,19 @@ export function RegistrosPanel({ patient }: { patient: Patient }) {
             una fecha; las filas son el soporte, la ventilación y los gases.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <p className="text-sm tabular-nums text-muted-foreground">
             {records.length}/{MAX_CLINICAL_RECORDS}
           </p>
+          <RegistrosViewSwitch value={view} onChange={setView} />
           <RegistrosDialog patient={patient} recordCount={records.length} />
         </div>
       </div>
 
       {isLoading ? (
         <div className="h-72 animate-pulse rounded-[1.6rem] bg-muted/50" />
+      ) : view === "grafico" ? (
+        <RegistrosChart records={records} />
       ) : (
         <RegistrosTable
           records={records}

@@ -1,0 +1,3 @@
+-- Applied remotely via MCP as clinical_records_kernel.
+-- Table public.clinical_records + RPC public.upsert_clinical_record / delete_clinical_record.
+-- Máximo 30 registros por paciente. Escritura solo por RPC; SELECT para staff activo.

@@ -1,6 +1,18 @@
 export const MAX_CLINICAL_RECORDS = 30;
 
-export const SUPPORT_OPTIONS = [
+export const SUPPORT_IDS = [
+  "vmi",
+  "vmni",
+  "cnaf",
+  "venturi",
+  "reservorio",
+  "naricera",
+  "ambiental",
+] as const;
+
+export type SupportId = (typeof SUPPORT_IDS)[number];
+
+export const SUPPORT_OPTIONS: { id: SupportId; label: string }[] = [
   { id: "vmi", label: "VMI" },
   { id: "vmni", label: "VMNI" },
   { id: "cnaf", label: "CNAF" },
@@ -8,11 +20,7 @@ export const SUPPORT_OPTIONS = [
   { id: "reservorio", label: "M. Reservorio" },
   { id: "naricera", label: "Naricera" },
   { id: "ambiental", label: "Ambiental" },
-] as const;
-
-export type SupportId = (typeof SUPPORT_OPTIONS)[number]["id"];
-
-export const SUPPORT_IDS = SUPPORT_OPTIONS.map((item) => item.id);
+];
 
 export type RecordFieldId =
   | "support"
@@ -28,7 +36,10 @@ export type RecordFieldId =
   | "paco2"
   | "hco3"
   | "eb"
-  | "pafi";
+  | "pafi"
+  | "pcr"
+  | "lactato"
+  | "procalcitonina";
 
 export type RecordRow = {
   id: RecordFieldId;
@@ -54,6 +65,9 @@ export const EXAM_ROWS: RecordRow[] = [
   { id: "hco3", label: "HCO₃", unit: "mEq/L" },
   { id: "eb", label: "EB", unit: "mEq/L" },
   { id: "pafi", label: "PaFi" },
+  { id: "pcr", label: "PCR", unit: "mg/L" },
+  { id: "lactato", label: "Ác. láctico", unit: "mmol/L" },
+  { id: "procalcitonina", label: "Procalcitonina", unit: "ng/mL" },
 ];
 
 export const TABLE_ROWS: { title: string; rows: RecordRow[] }[] = [

@@ -10,6 +10,8 @@ import {
 } from "@/modules/registros/schemas";
 import type { ClinicalRecord } from "@/shared/types/database";
 
+export { parseOptionalNumber };
+
 export function toDatetimeLocal(value = new Date()) {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}T${pad(value.getHours())}:${pad(value.getMinutes())}`;
@@ -46,7 +48,13 @@ export function computePafi(
   pao2: number | null,
   fio2: number | null,
 ): number | null {
-  if (pao2 == null || fio2 == null || fio2 <= 0) {
+  if (
+    pao2 == null ||
+    fio2 == null ||
+    !Number.isFinite(pao2) ||
+    !Number.isFinite(fio2) ||
+    fio2 <= 0
+  ) {
     return null;
   }
   const fraction = fio2 <= 1 ? fio2 : fio2 / 100;
@@ -77,6 +85,9 @@ export function emptyRecordForm(): RecordFormValues {
     paco2: "",
     hco3: "",
     eb: "",
+    pcr: "",
+    lactato: "",
+    procalcitonina: "",
   };
 }
 
@@ -96,45 +107,43 @@ export function recordToFormValues(record: ClinicalRecord): RecordFormValues {
     paco2: numberToInput(record.paco2),
     hco3: numberToInput(record.hco3),
     eb: numberToInput(record.eb),
+    pcr: numberToInput(record.pcr),
+    lactato: numberToInput(record.lactato),
+    procalcitonina: numberToInput(record.procalcitonina),
   };
+}
+
+function toNullableNumber(value: string) {
+  const parsed = parseOptionalNumber(value);
+  return parsed == null || Number.isNaN(parsed) ? null : parsed;
 }
 
 export function formValuesToPayload(patientId: string, values: RecordFormValues) {
   const support = values.support;
-  const fio2 = parseOptionalNumber(values.fio2);
-  const pao2 = parseOptionalNumber(values.pao2);
+  const fio2 = toNullableNumber(values.fio2);
+  const pao2 = toNullableNumber(values.pao2);
 
   return {
     patient_id: patientId,
     recorded_at: datetimeLocalToIso(values.recorded_at),
     support,
-    peep: supportNeedsVmi(support) ? parseOptionalNumber(values.peep) : null,
-    pmva: supportNeedsVmi(support) ? parseOptionalNumber(values.pmva) : null,
+    peep: supportNeedsVmi(support) ? toNullableNumber(values.peep) : null,
+    pmva: supportNeedsVmi(support) ? toNullableNumber(values.pmva) : null,
     driving_pressure: supportNeedsVmi(support)
-      ? parseOptionalNumber(values.driving_pressure)
+      ? toNullableNumber(values.driving_pressure)
       : null,
-    iox: supportNeedsVmi(support) ? parseOptionalNumber(values.iox) : null,
-    ps: supportNeedsVmni(support) ? parseOptionalNumber(values.ps) : null,
-    epap: supportNeedsVmni(support) ? parseOptionalNumber(values.epap) : null,
-    flujo: supportNeedsFlujo(support) ? parseOptionalNumber(values.flujo) : null,
+    iox: supportNeedsVmi(support) ? toNullableNumber(values.iox) : null,
+    ps: supportNeedsVmni(support) ? toNullableNumber(values.ps) : null,
+    epap: supportNeedsVmni(support) ? toNullableNumber(values.epap) : null,
+    flujo: supportNeedsFlujo(support) ? toNullableNumber(values.flujo) : null,
     fio2,
     pao2,
-    paco2: parseOptionalNumber(values.paco2),
-    hco3: parseOptionalNumber(values.hco3),
-    eb: parseOptionalNumber(values.eb),
-    pafi: computePafi(
-      Number.isNaN(pao2 as number) ? null : pao2,
-      Number.isNaN(fio2 as number) ? null : fio2,
-    ),
+    paco2: toNullableNumber(values.paco2),
+    hco3: toNullableNumber(values.hco3),
+    eb: toNullableNumber(values.eb),
+    pcr: toNullableNumber(values.pcr),
+    lactato: toNullableNumber(values.lactato),
+    procalcitonina: toNullableNumber(values.procalcitonina),
+    pafi: computePafi(pao2, fio2),
   };
-}
-
-export function cellValue(
-  record: ClinicalRecord,
-  field: keyof ClinicalRecord | "support",
-) {
-  if (field === "support") {
-    return record.support;
-  }
-  return record[field];
 }

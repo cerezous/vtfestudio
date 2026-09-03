@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ApachePanel } from "@/modules/apache/components/apache-panel";
 import { ClinicalChartHeader } from "@/modules/clinical-chart/components/clinical-chart-header";
 import { ClinicalChartNav } from "@/modules/clinical-chart/components/clinical-chart-nav";
+import { VmiPanel } from "@/modules/vmi/components/vmi-panel";
 import { ComingSoonPanel } from "@/modules/clinical-chart/components/panels/coming-soon-panel";
 import { HospitalizationDataPanel } from "@/modules/clinical-chart/components/panels/hospitalization-data-panel";
 import { PersonalDataPanel } from "@/modules/clinical-chart/components/panels/personal-data-panel";
@@ -18,6 +19,7 @@ import {
   findChartSection,
   type ChartSection,
 } from "@/modules/clinical-chart/sections";
+import { RegistrosPanel } from "@/modules/registros/components/registros-panel";
 import type { Patient } from "@/shared/types/database";
 
 function ChartCanvas({
@@ -40,21 +42,11 @@ function ChartCanvas({
   }
 
   if (section.id === "datos-vmi") {
-    return (
-      <ComingSoonPanel
-        title="Datos de VMI"
-        description="Los parámetros de ventilación mecánica invasiva se registrarán aquí."
-      />
-    );
+    return <VmiPanel patient={patient} />;
   }
 
   if (section.id === "registros") {
-    return (
-      <ComingSoonPanel
-        title="Registros"
-        description="Los registros clínicos del estudio se verán en esta sección."
-      />
-    );
+    return <RegistrosPanel patient={patient} />;
   }
 
   return (
@@ -102,7 +94,9 @@ export function ClinicalChart({ patient }: { patient: Patient }) {
         onNavigate={goToSection}
       />
       <section className="rounded-[1.6rem] border bg-muted/20 p-3 lg:p-4">
-        {section.id === "apache-ii" ? null : (
+        {section.id === "apache-ii" ||
+        section.id === "registros" ||
+        section.id === "datos-vmi" ? null : (
           <h2 className="mb-3 text-lg font-semibold tracking-tight">
             {section.label}
           </h2>

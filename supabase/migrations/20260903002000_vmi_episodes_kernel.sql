@@ -1,0 +1,2 @@
+-- Applied remotely via MCP as vmi_episodes_kernel.
+-- Table public.vmi_episodes + RPC public.upsert_vmi_episode / delete_vmi_episode.

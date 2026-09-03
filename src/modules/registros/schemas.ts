@@ -23,6 +23,9 @@ export type RecordFormValues = {
   paco2: string;
   hco3: string;
   eb: string;
+  pcr: string;
+  lactato: string;
+  procalcitonina: string;
 };
 
 const RANGES: Record<
@@ -41,6 +44,9 @@ const RANGES: Record<
   paco2: { min: 0, max: 250, label: "PaCO₂" },
   hco3: { min: 0, max: 80, label: "HCO₃" },
   eb: { min: -50, max: 50, label: "EB" },
+  pcr: { min: 0, max: 500, label: "PCR" },
+  lactato: { min: 0, max: 30, label: "Lactato" },
+  procalcitonina: { min: 0, max: 200, label: "Procalcitonina" },
 };
 
 export function parseOptionalNumber(value: string) {
@@ -107,7 +113,7 @@ function optionalNumber(
 export const recordFormSchema = z
   .object({
     recorded_at: z.string().trim().min(1, "Indica la fecha."),
-    support: z.enum(SUPPORT_IDS as [SupportId, ...SupportId[]]),
+    support: z.enum(SUPPORT_IDS),
     peep: z.string(),
     pmva: z.string(),
     driving_pressure: z.string(),
@@ -120,6 +126,9 @@ export const recordFormSchema = z
     paco2: z.string(),
     hco3: z.string(),
     eb: z.string(),
+    pcr: z.string(),
+    lactato: z.string(),
+    procalcitonina: z.string(),
   })
   .superRefine((values, ctx) => {
     requireNumber(ctx, values, "fio2");
@@ -144,4 +153,7 @@ export const recordFormSchema = z
     optionalNumber(ctx, values, "paco2");
     optionalNumber(ctx, values, "hco3");
     optionalNumber(ctx, values, "eb");
+    optionalNumber(ctx, values, "pcr");
+    optionalNumber(ctx, values, "lactato");
+    optionalNumber(ctx, values, "procalcitonina");
   });
