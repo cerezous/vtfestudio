@@ -55,6 +55,12 @@ export const CHART_GROUPS: ChartGroup[] = [
         ready: true,
       },
       {
+        id: "hitos",
+        label: "Hitos",
+        kind: "canvas",
+        ready: true,
+      },
+      {
         id: "epicrisis",
         label: "Epicrisis",
         kind: "canvas",

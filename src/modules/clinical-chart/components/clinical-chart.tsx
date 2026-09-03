@@ -19,6 +19,7 @@ import {
   findChartSection,
   type ChartSection,
 } from "@/modules/clinical-chart/sections";
+import { HitosPanel } from "@/modules/hitos/components/hitos-panel";
 import { RegistrosPanel } from "@/modules/registros/components/registros-panel";
 import type { Patient } from "@/shared/types/database";
 
@@ -47,6 +48,10 @@ function ChartCanvas({
 
   if (section.id === "registros") {
     return <RegistrosPanel patient={patient} />;
+  }
+
+  if (section.id === "hitos") {
+    return <HitosPanel patient={patient} />;
   }
 
   return (
@@ -96,6 +101,7 @@ export function ClinicalChart({ patient }: { patient: Patient }) {
       <section className="rounded-[1.6rem] border bg-muted/20 p-3 lg:p-4">
         {section.id === "apache-ii" ||
         section.id === "registros" ||
+        section.id === "hitos" ||
         section.id === "datos-vmi" ? null : (
           <h2 className="mb-3 text-lg font-semibold tracking-tight">
             {section.label}

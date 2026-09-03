@@ -7,6 +7,7 @@ import {
   Activity,
   ClipboardList,
   FileText,
+  Flag,
   HeartPulse,
   NotebookPen,
   UserRound,
@@ -23,6 +24,7 @@ const SECTION_ICONS: Record<string, ComponentType<{ className?: string }>> = {
   "apache-ii": Activity,
   "datos-vmi": Wind,
   registros: HeartPulse,
+  hitos: Flag,
   epicrisis: NotebookPen,
 };
 

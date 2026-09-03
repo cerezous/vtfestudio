@@ -1,0 +1,3 @@
+-- Applied remotely via MCP as clinical_milestones_kernel.
+-- Table public.clinical_milestones + RPC public.upsert_clinical_milestone / delete_clinical_milestone.
+-- Escritura solo por RPC; SELECT para staff activo.

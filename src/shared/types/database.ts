@@ -196,6 +196,74 @@ export type Database = {
           },
         ];
       };
+      clinical_milestones: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          eb: number | null;
+          fio2: number | null;
+          hco3: number | null;
+          id: string;
+          kind: string;
+          lactato: number | null;
+          motivo: string | null;
+          occurred_at: string;
+          paco2: number | null;
+          pafi: number | null;
+          pao2: number | null;
+          patient_id: string;
+          updated_at: string;
+          weaning_result: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          eb?: number | null;
+          fio2?: number | null;
+          hco3?: number | null;
+          id?: string;
+          kind: string;
+          lactato?: number | null;
+          motivo?: string | null;
+          occurred_at: string;
+          paco2?: number | null;
+          pafi?: number | null;
+          pao2?: number | null;
+          patient_id: string;
+          updated_at?: string;
+          weaning_result?: string | null;
+        };
+        Update: {
+          eb?: number | null;
+          fio2?: number | null;
+          hco3?: number | null;
+          kind?: string;
+          lactato?: number | null;
+          motivo?: string | null;
+          occurred_at?: string;
+          paco2?: number | null;
+          pafi?: number | null;
+          pao2?: number | null;
+          weaning_result?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "clinical_milestones_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "clinical_milestones_patient_id_fkey";
+            columns: ["patient_id"];
+            isOneToOne: false;
+            referencedRelation: "patients";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       apache_scores: {
         Row: {
           age_points: number;
@@ -357,6 +425,11 @@ export type Database = {
         Returns: Database["public"]["Tables"]["clinical_records"]["Row"];
       };
       delete_clinical_record: { Args: { p_id: string }; Returns: undefined };
+      upsert_clinical_milestone: {
+        Args: { p_id: string | null; p_payload: Json };
+        Returns: Database["public"]["Tables"]["clinical_milestones"]["Row"];
+      };
+      delete_clinical_milestone: { Args: { p_id: string }; Returns: undefined };
       upsert_vmi_episode: {
         Args: { p_id: string | null; p_payload: Json };
         Returns: Database["public"]["Tables"]["vmi_episodes"]["Row"];
@@ -409,6 +482,7 @@ export type Profile = Tables<"profiles">;
 export type Patient = Tables<"patients">;
 export type ApacheScore = Tables<"apache_scores">;
 export type ClinicalRecord = Tables<"clinical_records">;
+export type ClinicalMilestone = Tables<"clinical_milestones">;
 export type VmiEpisode = Tables<"vmi_episodes">;
 export type PatientStatus = "hospitalized" | "not_hospitalized" | "deceased";
 export type StaffRole = "admin" | "investigator" | "coordinator" | "staff";
