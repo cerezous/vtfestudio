@@ -89,8 +89,7 @@ export function ApacheDialog({
                 {editing ? "Editar APACHE II" : "Nuevo APACHE II"}
               </DialogTitle>
               <DialogDescription>
-                Haz clic en el rango de cada parámetro. El puntaje y la
-                mortalidad se calculan al instante.
+                Elige el rango de cada parámetro. El puntaje se calcula solo.
               </DialogDescription>
             </div>
             <ApacheScoreSummary state={state} />

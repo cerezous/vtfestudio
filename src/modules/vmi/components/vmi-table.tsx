@@ -19,7 +19,7 @@ export function VmiTable({
   if (episodes.length === 0) {
     return (
       <div className="grid min-h-40 place-items-center rounded-[1.4rem] border border-dashed bg-muted/40 px-6 text-center text-sm text-muted-foreground">
-        Aún no hay datos de VMI. Regístralos con el botón de arriba.
+        Sin datos de VMI. Regístralos arriba.
       </div>
     );
   }

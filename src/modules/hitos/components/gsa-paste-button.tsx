@@ -11,6 +11,7 @@ import {
   readClipboardGipiText,
 } from "@/modules/registros/gipi/map-exams";
 import { Button } from "@/shared/components/ui/button";
+import { textareaClass } from "@/shared/components/ui/controls";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
+import { cn } from "@/shared/lib/utils";
 
 const GSA_FIELDS = [
   "pao2",
@@ -32,7 +34,7 @@ const GSA_FIELDS = [
 function applyGsa(form: UseFormReturn<HitoFormValues>, texto: string) {
   const mapped = mapGipiPaste(texto, "gsa");
   if (!mapped) {
-    toast.error("No se detectó gasometría. Copia la tabla GSA desde GIPI.");
+    toast.error("No hay gasometría. Copia la tabla GSA de GIPI.");
     return false;
   }
 
@@ -54,7 +56,7 @@ function applyGsa(form: UseFormReturn<HitoFormValues>, texto: string) {
   const filled = mapped.labels.length
     ? mapped.labels.join(", ")
     : "fecha del examen";
-  toast.success(`GSA de respaldo pegada: ${filled}.`);
+  toast.success(`GSA pegada: ${filled}.`);
   return true;
 }
 
@@ -72,7 +74,7 @@ export function GsaPasteButton({
       setTexto("");
       setFallback(true);
       toast.error(
-        "No se pudo leer el portapapeles. Pega la tabla GIPI en el cuadro.",
+        "No se leyó el portapapeles. Pega la tabla aquí.",
       );
       return;
     }
@@ -99,15 +101,15 @@ export function GsaPasteButton({
       >
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Pegar tabla GIPI (GSA)</DialogTitle>
+            <DialogTitle>Pegar GSA</DialogTitle>
             <DialogDescription>
-              Pega el HTML o texto tabulado de la grilla GASOMETRÍA.
+              Pega la grilla GASOMETRÍA de GIPI.
             </DialogDescription>
           </DialogHeader>
           <textarea
             aria-label="Contenido pegado"
-            className="min-h-48 w-full rounded-xl border border-input bg-transparent px-3 py-2 font-mono text-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-            placeholder="Ctrl+V / Cmd+V…"
+            className={cn(textareaClass, "min-h-48 font-mono text-[13px]")}
+            placeholder="Pega aquí"
             value={texto}
             onChange={(event) => setTexto(event.target.value)}
           />

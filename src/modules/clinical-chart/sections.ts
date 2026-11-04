@@ -20,13 +20,7 @@ export const CHART_GROUPS: ChartGroup[] = [
     items: [
       {
         id: "datos-personales",
-        label: "Datos personales",
-        kind: "canvas",
-        ready: true,
-      },
-      {
-        id: "datos-hospitalizacion",
-        label: "Datos de hospitalización",
+        label: "Datos del paciente",
         kind: "canvas",
         ready: true,
       },
@@ -43,20 +37,8 @@ export const CHART_GROUPS: ChartGroup[] = [
         ready: true,
       },
       {
-        id: "datos-vmi",
-        label: "Datos de VMI",
-        kind: "canvas",
-        ready: true,
-      },
-      {
         id: "registros",
         label: "Registros",
-        kind: "canvas",
-        ready: true,
-      },
-      {
-        id: "hitos",
-        label: "Hitos",
         kind: "canvas",
         ready: true,
       },
@@ -100,3 +82,9 @@ export function chartSectionFromPath(segments?: string[]) {
 export function isKnownChartSection(sectionId: string) {
   return flattenChartSections().some((section) => section.id === sectionId);
 }
+
+export const CHART_SECTION_ALIASES: Record<string, string> = {
+  "datos-vmi": "registros",
+  hitos: "registros",
+  "datos-hospitalizacion": "datos-personales",
+};

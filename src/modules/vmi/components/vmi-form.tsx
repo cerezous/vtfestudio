@@ -10,13 +10,16 @@ import {
 } from "@/modules/vmi/constants";
 import { vmiFormSchema, type VmiFormValues } from "@/modules/vmi/schemas";
 import { Button } from "@/shared/components/ui/button";
+import {
+  choiceRowClass,
+  fieldClass,
+  selectClass,
+  textareaClass,
+} from "@/shared/components/ui/controls";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { cn } from "@/shared/lib/utils";
 import type { VmiEpisode } from "@/shared/types/database";
-
-const fieldClass =
-  "h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-60";
 
 function Field({
   label,
@@ -31,7 +34,7 @@ function Field({
 }) {
   return (
     <div className={cn("space-y-1.5", className)}>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <Label>{label}</Label>
       {children}
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
     </div>
@@ -85,7 +88,7 @@ export function VmiForm({
           error={form.formState.errors.motivo_vmi?.message}
         >
           <select
-            className={cn(fieldClass, "bg-background")}
+            className={selectClass}
             {...form.register("motivo_vmi")}
           >
             <option value="">Selecciona</option>
@@ -120,7 +123,7 @@ export function VmiForm({
           error={form.formState.errors.lugar_iot?.message}
         >
           <select
-            className={cn(fieldClass, "bg-background")}
+            className={selectClass}
             {...form.register("lugar_iot")}
           >
             <option value="">Sin dato</option>
@@ -133,16 +136,10 @@ export function VmiForm({
         </Field>
         <div className="grid gap-2 sm:col-span-2 sm:grid-cols-2">
           <label
-            className={cn(
-              "flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm",
-              dificil
-                ? "border-primary bg-accent text-accent-foreground"
-                : "border-input bg-background",
-            )}
+            className={choiceRowClass(dificil)}
           >
             <input
               type="checkbox"
-              className="size-4 accent-[#2F6BFF]"
               checked={dificil}
               onChange={() =>
                 form.setValue("intubacion_dificil", !dificil, {
@@ -153,16 +150,10 @@ export function VmiForm({
             Intubación difícil
           </label>
           <label
-            className={cn(
-              "flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm",
-              reintubacion
-                ? "border-primary bg-accent text-accent-foreground"
-                : "border-input bg-background",
-            )}
+            className={choiceRowClass(reintubacion)}
           >
             <input
               type="checkbox"
-              className="size-4 accent-[#2F6BFF]"
               checked={reintubacion}
               onChange={() =>
                 form.setValue("reintubacion", !reintubacion, {
@@ -191,7 +182,7 @@ export function VmiForm({
         >
           <textarea
             rows={3}
-            className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            className={textareaClass}
             {...form.register("observaciones")}
           />
         </Field>

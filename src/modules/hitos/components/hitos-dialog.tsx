@@ -21,18 +21,26 @@ export function HitosDialog({
   patient,
   milestone,
   initialKind = "iot",
-  fechaIot,
   triggerLabel = "Nuevo hito",
+  title,
+  description,
+  submitLabel,
+  allowedKinds,
   open,
   onOpenChange,
+  onSaved,
 }: {
   patient: Patient;
   milestone?: ClinicalMilestone | null;
   initialKind?: HitoKind;
-  fechaIot?: string | null;
   triggerLabel?: string;
+  title?: string;
+  description?: string;
+  submitLabel?: string;
+  allowedKinds?: readonly HitoKind[];
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onSaved?: (row: ClinicalMilestone) => void;
 }) {
   const [internalOpen, setInternalOpen] = useState(false);
   const upsert = useUpsertClinicalMilestone(patient.id);
@@ -60,11 +68,14 @@ export function HitosDialog({
       <Dialog open={isOpen} onOpenChange={setOpen}>
         <DialogContent className="max-h-[92vh] w-[calc(100vw-1.5rem)] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editing ? "Editar hito" : triggerLabel}</DialogTitle>
+            <DialogTitle>
+              {title ?? (editing ? "Editar hito" : triggerLabel)}
+            </DialogTitle>
             <DialogDescription>
-              {initialKind === "iot" && !editing
-                ? "La línea de tiempo parte por la IOT. Luego puedes marcar pronación, ECMO, TQT, extubación y weaning."
-                : "Marca el hito con su fecha. Pronación, supinación y ECMO llevan GSA de respaldo."}
+              {description ??
+                (initialKind === "iot" && !editing
+                  ? "Motivo, fecha y lugar de la IOT."
+                  : "Fecha del hito. Pronación, supinación y ECMO piden GSA.")}
             </DialogDescription>
           </DialogHeader>
           {isOpen ? (
@@ -73,15 +84,23 @@ export function HitosDialog({
               defaultValues={
                 milestone
                   ? milestoneToFormValues(milestone)
-                  : emptyHitoForm(initialKind, fechaIot)
+                  : emptyHitoForm(initialKind)
               }
               pending={upsert.isPending}
-              submitLabel={editing ? "Guardar cambios" : "Guardar hito"}
+              allowedKinds={allowedKinds}
+              submitLabel={
+                submitLabel ?? (editing ? "Guardar cambios" : "Guardar hito")
+              }
               onCancel={() => setOpen(false)}
               onSubmit={(values) => {
                 upsert.mutate(
                   { id: milestone?.id, values },
-                  { onSuccess: () => setOpen(false) },
+                  {
+                    onSuccess: (row) => {
+                      onSaved?.(row);
+                      setOpen(false);
+                    },
+                  },
                 );
               }}
             />

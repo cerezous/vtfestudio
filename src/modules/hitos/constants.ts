@@ -22,6 +22,8 @@ export const HITO_KIND_OPTIONS = [
 
 export const GSA_HITO_KINDS = ["pronacion", "supinacion", "ecmo"] as const;
 
+export { LUGAR_IOT_OPTIONS, MOTIVO_VMI_OPTIONS as MOTIVO_IOT_OPTIONS } from "@/modules/vmi/constants";
+
 export const MOTIVO_TQT_OPTIONS = [
   "Destete prolongado",
   "Destete difícil",

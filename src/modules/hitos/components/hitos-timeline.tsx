@@ -2,41 +2,11 @@
 
 import { Pencil, Trash2 } from "lucide-react";
 
-import {
-  hitoKindColor,
-  hitoKindLabel,
-  hitoNeedsGsa,
-  type HitoKind,
-} from "@/modules/hitos/constants";
-import { formatRecordNumber } from "@/modules/registros/model";
+import { hitoKindColor, hitoKindLabel } from "@/modules/hitos/constants";
+import { milestoneDetailText } from "@/modules/hitos/display";
 import { formatDateTime } from "@/modules/patients/display";
 import { Button } from "@/shared/components/ui/button";
 import type { ClinicalMilestone } from "@/shared/types/database";
-
-function detailText(milestone: ClinicalMilestone) {
-  if (milestone.kind === "tqt") {
-    return milestone.motivo ?? "Sin motivo";
-  }
-  if (milestone.kind === "weaning") {
-    return milestone.weaning_result === "exitosa" ? "Exitosa" : "Fallo";
-  }
-  if (hitoNeedsGsa(milestone.kind as HitoKind)) {
-    const pafi =
-      milestone.pafi == null ? null : formatRecordNumber(milestone.pafi);
-    const pao2 =
-      milestone.pao2 == null ? null : formatRecordNumber(milestone.pao2);
-    const fio2 =
-      milestone.fio2 == null ? null : formatRecordNumber(milestone.fio2);
-    return [
-      pafi ? `PaFi ${pafi}` : null,
-      pao2 ? `PaO₂ ${pao2}` : null,
-      fio2 ? `FiO₂ ${fio2}%` : null,
-    ]
-      .filter(Boolean)
-      .join(" · ");
-  }
-  return "Fecha registrada";
-}
 
 export function HitosTimeline({
   milestones,
@@ -49,8 +19,8 @@ export function HitosTimeline({
 }) {
   if (milestones.length === 0) {
     return (
-      <div className="grid min-h-48 place-items-center rounded-[1.6rem] border border-dashed bg-muted/40 px-6 text-center text-sm text-muted-foreground">
-        Aún no hay hitos. Comienza registrando la IOT.
+      <div className="grid min-h-48 place-items-center rounded-[1.6rem] bg-[rgb(120_120_128/0.08)] px-6 text-center text-sm text-muted-foreground">
+        Sin hitos. Empieza por la IOT.
       </div>
     );
   }
@@ -68,7 +38,7 @@ export function HitosTimeline({
               style={{ backgroundColor: weaningFail ? "#dc2626" : color }}
             />
             <div
-              className="flex cursor-pointer items-start justify-between gap-3 rounded-[1.3rem] border bg-card px-4 py-3 shadow-sm transition hover:bg-muted/40"
+              className="dash-surface flex cursor-pointer items-start justify-between gap-3 rounded-[1.3rem] px-4 py-3 transition hover:bg-muted/40"
               onClick={() => onEdit(milestone)}
             >
               <div className="min-w-0">
@@ -79,8 +49,13 @@ export function HitosTimeline({
                   {formatDateTime(milestone.occurred_at)}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {detailText(milestone)}
+                  {milestoneDetailText(milestone)}
                 </p>
+                {milestone.notes ? (
+                  <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/80">
+                    {milestone.notes}
+                  </p>
+                ) : null}
               </div>
               <div className="flex shrink-0 gap-1">
                 <Button

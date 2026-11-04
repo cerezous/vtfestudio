@@ -42,11 +42,11 @@ export function LoginForm() {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-zinc-700">Usuario</FormLabel>
+              <FormLabel>Usuario</FormLabel>
               <FormControl>
                 <AuthTextField
                   autoComplete="username"
-                  placeholder="Ingresa tu usuario"
+                  placeholder="Usuario"
                   variant="box"
                   {...field}
                 />
@@ -60,7 +60,7 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-zinc-700">Contraseña</FormLabel>
+              <FormLabel>Contraseña</FormLabel>
               <FormControl>
                 <AuthPasswordField
                   autoComplete="current-password"
@@ -77,7 +77,7 @@ export function LoginForm() {
         <label className="flex items-center gap-2 text-sm text-zinc-500">
           <input
             type="checkbox"
-            className="size-4 rounded border-zinc-300 accent-[#2F6BFF]"
+            className="apple-checkbox"
             {...form.register("remember")}
           />
           Recordarme 30 días
@@ -87,7 +87,7 @@ export function LoginForm() {
 
         <Button
           type="submit"
-          className="h-12 w-full rounded-xl bg-[#2F6BFF] text-sm font-semibold text-white hover:bg-[#1D4ED8]"
+          className="h-12 w-full"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? "Entrando..." : "Entrar"}

@@ -48,7 +48,7 @@ export function VmiDialog({
               {editing ? "Editar datos de VMI" : "Registrar datos de VMI"}
             </DialogTitle>
             <DialogDescription>
-              Motivo, fecha de IOT y datos previos al ingreso a UCI.
+              Motivo, fecha de IOT y datos previos al ingreso.
             </DialogDescription>
           </DialogHeader>
           <VmiForm

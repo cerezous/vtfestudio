@@ -20,7 +20,8 @@ export function isPublicAsset(pathname: string) {
   return (
     pathname.startsWith("/auth/") ||
     pathname.startsWith("/_next/") ||
-    pathname === "/favicon.ico"
+    pathname === "/favicon.ico" ||
+    pathname === "/sw.js"
   );
 }
 

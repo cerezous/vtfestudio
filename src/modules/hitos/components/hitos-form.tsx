@@ -8,6 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { GsaPasteButton } from "@/modules/hitos/components/gsa-paste-button";
 import {
   HITO_KIND_OPTIONS,
+  LUGAR_IOT_OPTIONS,
+  MOTIVO_IOT_OPTIONS,
   MOTIVO_TQT_OPTIONS,
   WEANING_RESULTS,
   hitoNeedsGsa,
@@ -16,12 +18,18 @@ import {
 import { parseOptionalNumber, hitoFormSchema, type HitoFormValues } from "@/modules/hitos/schemas";
 import { computePafi } from "@/modules/registros/model";
 import { Button } from "@/shared/components/ui/button";
+import {
+  chipBase,
+  chipClass,
+  choiceRowClass,
+  computedFieldClass,
+  fieldClass,
+  selectClass,
+  textareaClass,
+} from "@/shared/components/ui/controls";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { cn } from "@/shared/lib/utils";
-
-const fieldClass =
-  "h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-60";
 
 function Field({
   label,
@@ -38,7 +46,7 @@ function Field({
 }) {
   return (
     <div className={cn("space-y-1.5", className)}>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <Label>{label}</Label>
       {children}
       {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
@@ -69,12 +77,14 @@ export function HitosForm({
   defaultValues,
   pending,
   submitLabel,
+  allowedKinds,
   onSubmit,
   onCancel,
 }: {
   defaultValues: HitoFormValues;
   pending: boolean;
   submitLabel: string;
+  allowedKinds?: readonly HitoKind[];
   onSubmit: (values: HitoFormValues) => void;
   onCancel: () => void;
 }) {
@@ -84,11 +94,17 @@ export function HitosForm({
   });
 
   const kind = form.watch("kind");
+  const motivoIot = form.watch("motivo_iot");
   const motivoTqt = form.watch("motivo_tqt");
   const weaning = form.watch("weaning_result");
+  const dificil = form.watch("intubacion_dificil");
+  const reintubacion = form.watch("reintubacion");
   const fio2 = form.watch("fio2");
   const pao2 = form.watch("pao2");
   const showGsa = hitoNeedsGsa(kind);
+  const kindOptions = allowedKinds
+    ? HITO_KIND_OPTIONS.filter((option) => allowedKinds.includes(option.id))
+    : HITO_KIND_OPTIONS;
 
   const pafi = useMemo(() => {
     return computePafi(parseOptionalNumber(pao2), parseOptionalNumber(fio2));
@@ -104,9 +120,17 @@ export function HitosForm({
       form.setValue("fio2", "");
       form.setValue("lactato", "");
     }
+    if (next !== "iot") {
+      form.setValue("motivo_iot", "");
+      form.setValue("lugar_iot", "");
+      form.setValue("intubacion_dificil", false);
+      form.setValue("reintubacion", false);
+    }
+    if (next !== "iot" && next !== "tqt") {
+      form.setValue("motivo_otro", "");
+    }
     if (next !== "tqt") {
       form.setValue("motivo_tqt", "");
-      form.setValue("motivo_otro", "");
     }
     if (next !== "weaning") {
       form.setValue("weaning_result", "");
@@ -119,21 +143,16 @@ export function HitosForm({
       onSubmit={form.handleSubmit((values) => onSubmit(values))}
     >
       <div className="space-y-2">
-        <p className="text-xs text-muted-foreground">Tipo de hito *</p>
+        <Label>Tipo de hito *</Label>
         <div className="flex flex-wrap gap-1.5">
-          {HITO_KIND_OPTIONS.map((option) => {
+          {kindOptions.map((option) => {
             const active = kind === option.id;
             return (
               <button
                 key={option.id}
                 type="button"
                 onClick={() => selectKind(option.id)}
-                className={cn(
-                  "rounded-xl border px-3 py-2 text-sm font-medium transition",
-                  active
-                    ? "border-primary bg-primary text-white"
-                    : "border-input bg-background hover:bg-accent",
-                )}
+                  className={chipClass(active)}
               >
                 {option.label}
               </button>
@@ -148,7 +167,7 @@ export function HitosForm({
       </div>
 
       <Field
-        label="Fecha *"
+        label={kind === "iot" ? "Fecha de IOT *" : "Fecha *"}
         error={form.formState.errors.occurred_at?.message}
       >
         <Input
@@ -158,6 +177,83 @@ export function HitosForm({
         />
       </Field>
 
+      {kind === "iot" ? (
+        <section className="grid gap-3 sm:grid-cols-2">
+          <Field
+            label="Motivo de la IOT *"
+            className="sm:col-span-2"
+            error={form.formState.errors.motivo_iot?.message}
+          >
+            <select
+              className={selectClass}
+              {...form.register("motivo_iot")}
+            >
+              <option value="">Selecciona</option>
+              {MOTIVO_IOT_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </Field>
+          {motivoIot === "Otro" ? (
+            <Field
+              label="Especificar motivo *"
+              className="sm:col-span-2"
+              error={form.formState.errors.motivo_otro?.message}
+            >
+              <Input className={fieldClass} {...form.register("motivo_otro")} />
+            </Field>
+          ) : null}
+          <Field
+            label="Lugar de IOT"
+            error={form.formState.errors.lugar_iot?.message}
+          >
+            <select
+              className={selectClass}
+              {...form.register("lugar_iot")}
+            >
+              <option value="">Sin dato</option>
+              {LUGAR_IOT_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <div className="grid gap-2 sm:col-span-2 sm:grid-cols-2">
+            <label
+              className={choiceRowClass(dificil)}
+            >
+              <input
+                type="checkbox"
+                checked={dificil}
+                onChange={() =>
+                  form.setValue("intubacion_dificil", !dificil, {
+                    shouldDirty: true,
+                  })
+                }
+              />
+              Intubación difícil
+            </label>
+            <label
+              className={choiceRowClass(reintubacion)}
+            >
+              <input
+                type="checkbox"
+                checked={reintubacion}
+                onChange={() =>
+                  form.setValue("reintubacion", !reintubacion, {
+                    shouldDirty: true,
+                  })
+                }
+              />
+              Reintubación
+            </label>
+          </div>
+        </section>
+      ) : null}
+
       {kind === "tqt" ? (
         <div className="grid gap-3 sm:grid-cols-2">
           <Field
@@ -166,7 +262,7 @@ export function HitosForm({
             error={form.formState.errors.motivo_tqt?.message}
           >
             <select
-              className={cn(fieldClass, "bg-background")}
+              className={selectClass}
               {...form.register("motivo_tqt")}
             >
               <option value="">Selecciona</option>
@@ -192,7 +288,7 @@ export function HitosForm({
       {kind === "weaning" ? (
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">
-            Resultado de la consolidación *
+            Resultado *
           </p>
           <div className="flex flex-wrap gap-1.5">
             {WEANING_RESULTS.map((option) => {
@@ -208,12 +304,13 @@ export function HitosForm({
                     })
                   }
                   className={cn(
-                    "rounded-xl border px-3 py-2 text-sm font-medium transition",
+                    chipBase,
+                    "rounded-full",
                     active
                       ? option.id === "exitosa"
-                        ? "border-emerald-600 bg-emerald-600 text-white"
-                        : "border-destructive bg-destructive text-white"
-                      : "border-input bg-background hover:bg-accent",
+                        ? "bg-emerald-600 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.28)]"
+                        : "bg-destructive text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.22)]"
+                      : "bg-[rgb(120_120_128/0.12)] text-foreground hover:bg-[rgb(120_120_128/0.18)]",
                   )}
                 >
                   {option.label}
@@ -233,7 +330,7 @@ export function HitosForm({
         <section className="space-y-3">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              GSA de respaldo
+              GSA
             </p>
             <GsaPasteButton form={form} />
           </div>
@@ -265,7 +362,8 @@ export function HitosForm({
               {...form.register("eb")}
             />
             <NumberField
-              label="Ác. láctico · mmol/L"
+              label="Ác. láctico · mg/dL"
+              hint="0 a 30"
               error={form.formState.errors.lactato?.message}
               {...form.register("lactato")}
             />
@@ -273,13 +371,26 @@ export function HitosForm({
               <Input
                 readOnly
                 tabIndex={-1}
-                className={cn(fieldClass, "bg-muted/50 font-medium tabular-nums")}
-                value={pafi == null ? "Se calcula con PaO₂ y FiO₂" : String(pafi)}
+                className={computedFieldClass}
+                value={pafi == null ? "PaO₂ / FiO₂" : String(pafi)}
               />
             </Field>
           </div>
         </section>
       ) : null}
+
+      <Field
+        label="Observación"
+        hint="Nota del hito"
+        error={form.formState.errors.notes?.message}
+      >
+        <textarea
+          rows={3}
+          className={textareaClass}
+          placeholder="Nota clínica"
+          {...form.register("notes")}
+        />
+      </Field>
 
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={onCancel}>

@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { createClient } from "@/shared/lib/supabase/server";
 
 export async function getPatients() {
@@ -14,7 +16,7 @@ export async function getPatients() {
   return data ?? [];
 }
 
-export async function getPatient(id: string) {
+export const getPatient = cache(async (id: string) => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("patients")
@@ -27,4 +29,4 @@ export async function getPatient(id: string) {
   }
 
   return data;
-}
+});

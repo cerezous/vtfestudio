@@ -12,6 +12,7 @@ import {
 } from "@/modules/registros/gipi/map-exams";
 import type { RecordFormValues } from "@/modules/registros/schemas";
 import { Button } from "@/shared/components/ui/button";
+import { textareaClass } from "@/shared/components/ui/controls";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
+import { cn } from "@/shared/lib/utils";
 
 function applyPatch(
   form: UseFormReturn<RecordFormValues>,
@@ -30,8 +32,8 @@ function applyPatch(
   if (!mapped) {
     toast.error(
       kind === "gsa"
-        ? "No se detectó gasometría. Copia la tabla GSA desde GIPI."
-        : "No se detectó hemograma ni perfil bioquímico. Copia la tabla desde GIPI.",
+        ? "No hay gasometría. Copia la tabla GSA de GIPI."
+        : "No hay laboratorio. Copia la tabla de GIPI.",
     );
     return false;
   }
@@ -69,7 +71,7 @@ export function GipiPasteButtons({
       setTexto("");
       setFallback(kind);
       toast.error(
-        "No se pudo leer el portapapeles. Pega la tabla GIPI en el cuadro.",
+        "No se leyó el portapapeles. Pega la tabla aquí.",
       );
       return;
     }
@@ -115,19 +117,19 @@ export function GipiPasteButtons({
           <DialogHeader>
             <DialogTitle>
               {fallback === "gsa"
-                ? "Pegar tabla GIPI (GSA)"
-                : "Pegar tabla GIPI (hemograma y bioquímica)"}
+                ? "Pegar GSA"
+                : "Pegar laboratorio"}
             </DialogTitle>
             <DialogDescription>
               {fallback === "gsa"
-                ? "Pega el HTML o texto tabulado de la grilla GASOMETRÍA."
-                : "Pega hemograma y perfil bioquímico de la misma muestra en GIPI."}
+                ? "Pega la grilla GASOMETRÍA de GIPI."
+                : "Pega hemograma y bioquímica de la misma muestra."}
             </DialogDescription>
           </DialogHeader>
           <textarea
             aria-label="Contenido pegado"
-            className="min-h-48 w-full rounded-xl border border-input bg-transparent px-3 py-2 font-mono text-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-            placeholder="Ctrl+V / Cmd+V…"
+            className={cn(textareaClass, "min-h-48 font-mono text-[13px]")}
+            placeholder="Pega aquí"
             value={texto}
             onChange={(event) => setTexto(event.target.value)}
           />

@@ -1,0 +1,2 @@
+-- Applied remotely via MCP as clinical_milestones_notes_all_kinds.
+-- Observaciones (notes) persistidas en todos los kinds de clinical_milestones.

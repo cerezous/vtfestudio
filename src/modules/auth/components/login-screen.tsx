@@ -20,8 +20,7 @@ export function LoginScreen() {
             Iniciar sesión
           </h1>
           <p className="mt-2 text-sm text-zinc-500">
-            Usuario <span className="font-medium text-zinc-700">mcerezo</span>.
-            La clave es tu RUT; puedes pegarlo con puntos y guión.
+            La clave es tu RUT, con o sin puntos.
           </p>
           <div className="mt-5 lg:mt-8">
             <LoginForm />

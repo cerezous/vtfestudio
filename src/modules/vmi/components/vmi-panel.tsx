@@ -39,8 +39,7 @@ export function VmiPanel({ patient }: { patient: Patient }) {
           <p className="text-sm text-muted-foreground">Estudio</p>
           <h2 className="text-2xl font-semibold tracking-tight">Datos de VMI</h2>
           <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-            Registra el motivo, la fecha de IOT y los datos previos al ingreso a
-            UCI.
+            Motivo, fecha de IOT y datos previos al ingreso.
           </p>
         </div>
         <VmiDialog patient={patient} />
@@ -80,7 +79,7 @@ export function VmiPanel({ patient }: { patient: Patient }) {
             <DialogTitle>Eliminar datos de VMI</DialogTitle>
             <DialogDescription>
               {removing
-                ? `Se eliminará el registro de IOT del ${formatDate(removing.fecha_iot)}. Esta acción no se puede deshacer.`
+                ? `Se elimina la IOT del ${formatDate(removing.fecha_iot)}. No se puede deshacer.`
                 : null}
             </DialogDescription>
           </DialogHeader>

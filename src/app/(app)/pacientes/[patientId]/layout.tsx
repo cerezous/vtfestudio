@@ -36,7 +36,7 @@ export default async function PatientChartLayout({
 
   return (
     <>
-      <ClinicalChart patient={patient} />
+      <ClinicalChart key={patient.id} patient={patient} />
       {children}
     </>
   );

@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 
 import type { StaffSession } from "@/modules/auth/session";
 import { AppHeader } from "@/shared/components/layout/app-header";
-import { AppSidebar } from "@/shared/components/layout/app-sidebar";
 
 export function AppShell({
   session,
@@ -12,14 +11,11 @@ export function AppShell({
   children: ReactNode;
 }) {
   return (
-    <div className="h-svh overflow-hidden bg-background">
-      <AppSidebar />
-      <div className="flex h-svh min-w-0 flex-col lg:ml-64">
+    <div className="flex h-svh min-w-0 flex-col overflow-hidden bg-background" data-app-shell>
+      <div data-app-chrome>
         <AppHeader profile={session.profile} />
-        <div className="min-h-0 flex-1 overflow-y-auto p-4 md:p-6">
-          {children}
-        </div>
       </div>
+      <div data-app-main className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 md:p-6">{children}</div>
     </div>
   );
 }

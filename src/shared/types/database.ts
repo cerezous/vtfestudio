@@ -36,6 +36,8 @@ export type Database = {
           id_rut: string;
           n_ficha: number;
           nacionalidad: string | null;
+          talla: number | null;
+          peso_ideal: number | null;
           nombre_social: string | null;
           nombres: string;
           prevision: string | null;
@@ -70,6 +72,8 @@ export type Database = {
           id_rut: string;
           n_ficha: number;
           nacionalidad?: string | null;
+          talla?: number | null;
+          peso_ideal?: number | null;
           nombre_social?: string | null;
           nombres: string;
           prevision?: string | null;
@@ -95,6 +99,8 @@ export type Database = {
           id_rut?: string;
           n_ficha?: number;
           nombres?: string;
+          talla?: number | null;
+          peso_ideal?: number | null;
           status?: string;
         };
         Relationships: [
@@ -132,6 +138,16 @@ export type Database = {
           recorded_at: string;
           support: string;
           updated_at: string;
+          vt: number | null;
+          vt_ml_kg_pi: number | null;
+          vent_mode: string | null;
+          fr: number | null;
+          pi: number | null;
+          ti: number | null;
+          ppeak: number | null;
+          pplat: number | null;
+          cest: number | null;
+          flow_pattern: string | null;
         };
         Insert: {
           created_at?: string;
@@ -157,6 +173,16 @@ export type Database = {
           recorded_at: string;
           support: string;
           updated_at?: string;
+          vt?: number | null;
+          vt_ml_kg_pi?: number | null;
+          vent_mode?: string | null;
+          fr?: number | null;
+          pi?: number | null;
+          ti?: number | null;
+          ppeak?: number | null;
+          pplat?: number | null;
+          cest?: number | null;
+          flow_pattern?: string | null;
         };
         Update: {
           driving_pressure?: number | null;
@@ -178,6 +204,16 @@ export type Database = {
           recorded_at?: string;
           support?: string;
           updated_at?: string;
+          vt?: number | null;
+          vt_ml_kg_pi?: number | null;
+          vent_mode?: string | null;
+          fr?: number | null;
+          pi?: number | null;
+          ti?: number | null;
+          ppeak?: number | null;
+          pplat?: number | null;
+          cest?: number | null;
+          flow_pattern?: string | null;
         };
         Relationships: [
           {
@@ -206,12 +242,16 @@ export type Database = {
           id: string;
           kind: string;
           lactato: number | null;
+          lugar_iot: string | null;
           motivo: string | null;
+          notes: string | null;
           occurred_at: string;
           paco2: number | null;
           pafi: number | null;
           pao2: number | null;
           patient_id: string;
+          intubacion_dificil: boolean;
+          reintubacion: boolean;
           updated_at: string;
           weaning_result: string | null;
         };
@@ -224,12 +264,16 @@ export type Database = {
           id?: string;
           kind: string;
           lactato?: number | null;
+          lugar_iot?: string | null;
           motivo?: string | null;
+          notes?: string | null;
           occurred_at: string;
           paco2?: number | null;
           pafi?: number | null;
           pao2?: number | null;
           patient_id: string;
+          intubacion_dificil?: boolean;
+          reintubacion?: boolean;
           updated_at?: string;
           weaning_result?: string | null;
         };
@@ -239,11 +283,15 @@ export type Database = {
           hco3?: number | null;
           kind?: string;
           lactato?: number | null;
+          lugar_iot?: string | null;
           motivo?: string | null;
+          notes?: string | null;
           occurred_at?: string;
           paco2?: number | null;
           pafi?: number | null;
           pao2?: number | null;
+          intubacion_dificil?: boolean;
+          reintubacion?: boolean;
           weaning_result?: string | null;
           updated_at?: string;
         };

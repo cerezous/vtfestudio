@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Search, X } from "lucide-react";
 
 import { PatientDialog } from "@/modules/patients/components/patient-dialog";
+import { PatientDischargeDialog } from "@/modules/patients/components/patient-discharge-dialog";
 import { PatientsTable } from "@/modules/patients/components/patients-table";
 import { patientFullName } from "@/modules/patients/display";
 import { useDeletePatient, usePatients } from "@/modules/patients/queries";
+import { patientMatchesQuery } from "@/modules/patients/search";
 import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -25,13 +29,20 @@ export function PatientsWorkspace({
   const { data, isLoading, error } = usePatients(initialPatients);
   const deletePatient = useDeletePatient();
   const [editing, setEditing] = useState<Patient | null>(null);
+  const [discharging, setDischarging] = useState<Patient | null>(null);
   const [removing, setRemoving] = useState<Patient | null>(null);
+  const [query, setQuery] = useState("");
   const patients = data ?? [];
+  const filtered = useMemo(
+    () => patients.filter((patient) => patientMatchesQuery(patient, query)),
+    [patients, query],
+  );
+  const searching = query.trim().length > 0;
 
   if (error) {
     return (
       <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
-        No se pudo cargar el registro de pacientes.
+        No se cargaron los pacientes.
       </p>
     );
   }
@@ -43,19 +54,46 @@ export function PatientsWorkspace({
           <p className="text-sm text-muted-foreground">Registro</p>
           <h1 className="text-3xl font-semibold tracking-tight">Pacientes</h1>
           <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-            Censo del estudio VMI. Haz clic en un paciente para abrir su ficha.
+            Elige un paciente para abrir su ficha.
           </p>
         </div>
         <PatientDialog />
+      </div>
+
+      <div className="relative">
+        <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Buscar por nombre, RUT, ficha o diagnóstico"
+          aria-label="Buscar pacientes"
+          className="h-11 rounded-[1.4rem] border bg-card pr-11 pl-10 shadow-sm"
+        />
+        {searching ? (
+          <button
+            type="button"
+            aria-label="Limpiar búsqueda"
+            onClick={() => setQuery("")}
+            className="absolute top-1/2 right-3 grid size-6 -translate-y-1/2 place-items-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          >
+            <X className="size-3.5" />
+          </button>
+        ) : null}
       </div>
 
       {isLoading ? (
         <div className="h-64 animate-pulse rounded-[1.6rem] bg-muted/50" />
       ) : (
         <PatientsTable
-          patients={patients}
+          patients={filtered}
+          emptyMessage={
+            searching
+              ? `Ningún paciente coincide con “${query.trim()}”.`
+              : undefined
+          }
           onEdit={setEditing}
           onDelete={setRemoving}
+          onDischarge={setDischarging}
         />
       )}
 
@@ -65,6 +103,16 @@ export function PatientsWorkspace({
         onOpenChange={(open) => {
           if (!open) {
             setEditing(null);
+          }
+        }}
+      />
+
+      <PatientDischargeDialog
+        patient={discharging}
+        open={Boolean(discharging)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDischarging(null);
           }
         }}
       />
@@ -82,7 +130,7 @@ export function PatientsWorkspace({
             <DialogTitle>Eliminar paciente</DialogTitle>
             <DialogDescription>
               {removing
-                ? `Se eliminará a ${patientFullName(removing)} del estudio. Esta acción no se puede deshacer.`
+                ? `Se elimina a ${patientFullName(removing)} del estudio. No se puede deshacer.`
                 : null}
             </DialogDescription>
           </DialogHeader>

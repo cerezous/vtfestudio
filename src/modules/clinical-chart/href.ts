@@ -1,4 +1,4 @@
-import { DEFAULT_CHART_SECTION } from "@/modules/clinical-chart/sections";
+import { DEFAULT_CHART_SECTION, CHART_SECTION_ALIASES } from "@/modules/clinical-chart/sections";
 import { ROUTES } from "@/shared/lib/constants";
 
 export function patientChartPath(patientId: string) {
@@ -29,5 +29,6 @@ export function chartSectionFromPathname(pathname: string, patientId: string) {
     return DEFAULT_CHART_SECTION;
   }
 
-  return pathname.slice(base.length + 1);
+  const section = pathname.slice(base.length + 1);
+  return CHART_SECTION_ALIASES[section] ?? section;
 }

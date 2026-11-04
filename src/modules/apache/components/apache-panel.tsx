@@ -30,7 +30,7 @@ export function ApachePanel({ patient }: { patient: Patient }) {
   if (error) {
     return (
       <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
-        No se pudo cargar el APACHE II.
+        No se cargó el APACHE II.
       </p>
     );
   }
@@ -42,8 +42,7 @@ export function ApachePanel({ patient }: { patient: Patient }) {
           <p className="text-sm text-muted-foreground">Escala</p>
           <h2 className="text-2xl font-semibold tracking-tight">APACHE II</h2>
           <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-            Registra cada medición. Se guarda la fecha, el puntaje y el % de
-            mortalidad.
+            Fecha, puntaje y mortalidad de cada medición.
           </p>
         </div>
         <ApacheDialog patient={patient} />
@@ -83,7 +82,7 @@ export function ApachePanel({ patient }: { patient: Patient }) {
             <DialogTitle>Eliminar APACHE II</DialogTitle>
             <DialogDescription>
               {removing
-                ? `Se eliminará el registro del ${formatDateTime(removing.scored_at)}. Esta acción no se puede deshacer.`
+                ? `Se elimina el registro del ${formatDateTime(removing.scored_at)}. No se puede deshacer.`
                 : null}
             </DialogDescription>
           </DialogHeader>

@@ -1,0 +1,3 @@
+-- Applied remotely via MCP as clinical_milestones_iot_fields.
+-- IOT fields on clinical_milestones (motivo, lugar, IOT difícil, reintubación, notes).
+-- Backfill from vmi_episodes. The Datos de VMI UI was folded into Hitos inside Registros.

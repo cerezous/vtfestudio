@@ -3,7 +3,7 @@ import { getDashboardSnapshot } from "@/modules/dashboard/server";
 import { requireStaffSession } from "@/modules/auth/session";
 
 export const metadata = {
-  title: "Dashboard",
+  title: "Estadística",
 };
 
 export default async function DashboardPage() {

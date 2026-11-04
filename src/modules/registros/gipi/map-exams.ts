@@ -205,7 +205,6 @@ export function mapGipiPaste(
     const eb = keyed.get("eb") ?? keyed.get("ebecf");
     const fio2 = keyed.get("fio2");
     const pmva = keyed.get("pmva");
-    const iox = keyed.get("iox");
     const lactato = keyed.get("lactato");
 
     if (pao2) applyNumeric(values, labels, "pao2", "PaO₂", pao2.resultado);
@@ -216,7 +215,6 @@ export function mapGipiPaste(
       applyNumeric(values, labels, "fio2", "FiO₂", fio2.resultado, normalizeFio2);
     }
     if (pmva) applyNumeric(values, labels, "pmva", "PmVA", pmva.resultado);
-    if (iox) applyNumeric(values, labels, "iox", "IOX", iox.resultado);
     if (lactato) {
       applyNumeric(values, labels, "lactato", "Ác. láctico", lactato.resultado);
     }

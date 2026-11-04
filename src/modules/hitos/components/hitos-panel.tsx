@@ -8,7 +8,6 @@ import {
   useClinicalMilestones,
   useDeleteClinicalMilestone,
 } from "@/modules/hitos/queries";
-import { useVmiEpisodes } from "@/modules/vmi/queries";
 import { formatDateTime } from "@/modules/patients/display";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -23,17 +22,15 @@ import type { ClinicalMilestone, Patient } from "@/shared/types/database";
 
 export function HitosPanel({ patient }: { patient: Patient }) {
   const { data, isLoading, error } = useClinicalMilestones(patient.id);
-  const vmi = useVmiEpisodes(patient.id);
   const deleteMilestone = useDeleteClinicalMilestone(patient.id);
   const [editing, setEditing] = useState<ClinicalMilestone | null>(null);
   const [removing, setRemoving] = useState<ClinicalMilestone | null>(null);
   const milestones = data ?? [];
-  const fechaIot = vmi.data?.[0]?.fecha_iot ?? null;
   const hasIot = milestones.some((item) => item.kind === "iot");
 
   if (error) {
     return (
-      <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+      <p className="rounded-[1.6rem] bg-[rgb(120_120_128/0.08)] px-4 py-8 text-center text-sm text-muted-foreground">
         No se pudieron cargar los hitos.
       </p>
     );
@@ -43,24 +40,21 @@ export function HitosPanel({ patient }: { patient: Patient }) {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">Estudio</p>
-          <h2 className="text-2xl font-semibold tracking-tight">Hitos</h2>
+          <p className="text-sm text-muted-foreground">Registros</p>
+          <h3 className="text-xl font-semibold tracking-tight">Hitos</h3>
           <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-            La línea de tiempo parte por la IOT. Luego marca pronación,
-            supinación, ECMO, TQT, extubación y la consolidación de weaning.
+            Empieza por la IOT. Luego pronación, ECMO, TQT, extubación y weaning.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <HitosDialog
             patient={patient}
             initialKind="iot"
-            fechaIot={fechaIot}
             triggerLabel="Registrar IOT"
           />
           <HitosDialog
             patient={patient}
             initialKind={hasIot ? "pronacion" : "iot"}
-            fechaIot={fechaIot}
             triggerLabel="Nuevo hito"
           />
         </div>
@@ -100,7 +94,7 @@ export function HitosPanel({ patient }: { patient: Patient }) {
             <DialogTitle>Eliminar hito</DialogTitle>
             <DialogDescription>
               {removing
-                ? `Se eliminará el hito del ${formatDateTime(removing.occurred_at)}. Esta acción no se puede deshacer.`
+                ? `Se elimina el hito del ${formatDateTime(removing.occurred_at)}. No se puede deshacer.`
                 : null}
             </DialogDescription>
           </DialogHeader>

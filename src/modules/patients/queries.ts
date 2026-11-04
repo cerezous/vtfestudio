@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { computePesoIdeal } from "@/modules/patients/anthropometry";
 import { formatRutInput } from "@/modules/patients/display";
 import {
   joinAntecedentes,
@@ -16,6 +17,10 @@ export const patientKeys = {
 };
 
 export function formValuesToPayload(values: PatientFormValues) {
+  const tallaRaw = values.talla.trim().replace(",", ".");
+  const talla = tallaRaw ? Number(tallaRaw) : null;
+  const tallaCm = talla != null && Number.isFinite(talla) ? talla : null;
+
   return {
     id_rut: formatRutInput(values.id_rut),
     n_ficha: values.n_ficha,
@@ -25,6 +30,8 @@ export function formValuesToPayload(values: PatientFormValues) {
     sexo: values.sexo || null,
     fecha_nacimiento: values.fecha_nacimiento,
     nacionalidad: values.nacionalidad ?? null,
+    talla: tallaCm,
+    peso_ideal: computePesoIdeal(tallaCm, values.sexo || null),
     diagnostico: values.diagnostico,
     grupo_diagnostico: values.grupo_diagnostico,
     antecedentes_morbidos: joinAntecedentes(values.antecedentes) || null,

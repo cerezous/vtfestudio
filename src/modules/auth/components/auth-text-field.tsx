@@ -16,11 +16,8 @@ export function AuthTextField({
     <div className="relative">
       <Input
         className={cn(
-          "h-12 px-5 text-sm shadow-none placeholder:text-zinc-400 focus-visible:ring-zinc-200",
-          variant === "pill" &&
-            "rounded-full border-transparent bg-zinc-100 focus-visible:border-zinc-300",
-          variant === "box" &&
-            "rounded-xl border-zinc-200 bg-white focus-visible:border-[#2F6BFF]",
+          "h-12 rounded-[12px] border-transparent bg-[rgb(120_120_128/0.12)] px-4 text-[17px] shadow-none placeholder:text-[rgb(60_60_67/0.45)] hover:bg-[rgb(120_120_128/0.16)] focus-visible:border-primary focus-visible:bg-white focus-visible:ring-4 focus-visible:ring-primary/25",
+          variant === "pill" && "rounded-full",
           trailing && "pr-12",
           className,
         )}

@@ -18,7 +18,7 @@ export function ApacheTable({
   if (records.length === 0) {
     return (
       <div className="grid min-h-40 place-items-center rounded-[1.4rem] border border-dashed bg-muted/40 px-6 text-center text-sm text-muted-foreground">
-        Aún no hay APACHE II. Crea el primero con el botón de arriba.
+        Sin APACHE II. Crea el primero arriba.
       </div>
     );
   }

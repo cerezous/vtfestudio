@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useState, type Key } from "react";
 import {
   Area,
   AreaChart,
@@ -17,11 +17,12 @@ import type { ClinicalRecord } from "@/shared/types/database";
 
 const SERIES = [
   { id: "pafi", label: "PaFi", color: "#c8f542", unit: "", darkText: true },
+  { id: "vt_ml_kg_pi", label: "ml/kg/PI", color: "#38bdf8", unit: "", darkText: false },
   { id: "pao2", label: "PaO₂", color: "#5b8cff", unit: "mmHg", darkText: false },
   { id: "paco2", label: "PaCO₂", color: "#c4b5fd", unit: "mmHg", darkText: false },
   { id: "fio2", label: "FiO₂", color: "#fb923c", unit: "%", darkText: false },
   { id: "pcr", label: "PCR", color: "#f87171", unit: "mg/L", darkText: false },
-  { id: "lactato", label: "Ác. láctico", color: "#fbbf24", unit: "mmol/L", darkText: false },
+  { id: "lactato", label: "Ác. láctico", color: "#fbbf24", unit: "mg/dL", darkText: false },
   { id: "procalcitonina", label: "PCT", color: "#f472b6", unit: "ng/mL", darkText: false },
 ] as const;
 
@@ -76,17 +77,17 @@ function ChartTooltip({
   }
 
   return (
-    <div className="min-w-40 rounded-2xl border border-white/10 bg-[#0b0d14]/95 px-3.5 py-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md">
-      <p className="text-[11px] text-white/50">
+    <div className="min-w-40 rounded-2xl border border-black/8 bg-white px-3.5 py-2.5 shadow-[0_12px_40px_rgba(15,18,28,0.12)]">
+      <p className="text-[11px] text-muted-foreground">
         {label ? formatTooltipDate(label) : ""}
       </p>
-      <p className="mt-1 text-[11px] font-medium uppercase tracking-wider text-white/40">
+      <p className="mt-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
         {serie.label}
       </p>
-      <p className="mt-0.5 text-lg font-semibold tabular-nums text-white">
+      <p className="mt-0.5 text-lg font-semibold tabular-nums text-foreground">
         {formatRecordNumber(value)}
         {serie.unit ? (
-          <span className="ml-1 text-xs font-medium text-white/45">
+          <span className="ml-1 text-xs font-medium text-muted-foreground">
             {serie.unit}
           </span>
         ) : null}
@@ -105,7 +106,7 @@ function GlowDot({
   color: string;
 }) {
   if (cx == null || cy == null) {
-    return null;
+    return <g />;
   }
 
   return (
@@ -117,7 +118,7 @@ function GlowDot({
         cy={cy}
         r={4}
         fill={color}
-        stroke="#0b0d12"
+        stroke="#ffffff"
         strokeWidth={2}
       />
     </g>
@@ -165,8 +166,8 @@ export function RegistrosChart({ records }: { records: ClinicalRecord[] }) {
 
   if (records.length === 0) {
     return (
-      <div className="grid min-h-72 place-items-center rounded-[1.6rem] border border-dashed bg-muted/40 px-6 text-center text-sm text-muted-foreground">
-        Aún no hay registros para graficar.
+      <div className="grid min-h-72 place-items-center rounded-[1.6rem] bg-[rgb(120_120_128/0.08)] px-6 text-center text-sm text-muted-foreground">
+        Sin registros para el gráfico.
       </div>
     );
   }
@@ -174,16 +175,16 @@ export function RegistrosChart({ records }: { records: ClinicalRecord[] }) {
   const fillId = `registros-fill-${gradientId}`;
 
   return (
-    <div className="relative overflow-hidden rounded-[1.7rem] bg-[#12141c] p-5 text-white shadow-[0_20px_60px_rgba(15,18,28,0.28)]">
+    <div className="relative overflow-hidden rounded-[1.7rem] border bg-white p-5 text-foreground shadow-sm">
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-16 -top-24 size-72 rounded-full opacity-40 blur-3xl"
+        className="pointer-events-none absolute -right-16 -top-24 size-72 rounded-full opacity-20 blur-3xl"
         style={{ background: serie.color }}
       />
       <div className="relative space-y-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/40">
+            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
               Evolución
             </p>
             <div className="mt-1 flex flex-wrap items-end gap-3">
@@ -198,7 +199,7 @@ export function RegistrosChart({ records }: { records: ClinicalRecord[] }) {
                       ? "bg-[#c8f542] text-[#15203a]"
                       : stats.delta < 0
                         ? "bg-[#fb7185]/20 text-[#fb7185]"
-                        : "bg-white/10 text-white/60",
+                        : "bg-muted text-muted-foreground",
                   )}
                 >
                   {stats.delta > 0 ? "+" : ""}
@@ -208,7 +209,7 @@ export function RegistrosChart({ records }: { records: ClinicalRecord[] }) {
                 </span>
               ) : null}
             </div>
-            <p className="mt-1 text-sm text-white/50">
+            <p className="mt-1 text-sm text-muted-foreground">
               {serie.label}
               {serie.unit ? ` · ${serie.unit}` : ""}
               {stats.latest
@@ -228,7 +229,7 @@ export function RegistrosChart({ records }: { records: ClinicalRecord[] }) {
                     "rounded-full px-3 py-1 text-xs font-medium transition",
                     on
                       ? "shadow-[0_0_18px_rgba(200,245,66,0.18)]"
-                      : "bg-white/6 text-white/55 hover:bg-white/10 hover:text-white",
+                      : "bg-black/5 text-foreground/70 hover:bg-black/8 hover:text-foreground",
                   )}
                   style={
                     on
@@ -248,7 +249,7 @@ export function RegistrosChart({ records }: { records: ClinicalRecord[] }) {
 
         <div className="h-[26rem] w-full">
           {stats.points.length === 0 ? (
-            <div className="grid h-full place-items-center text-sm text-white/40">
+            <div className="grid h-full place-items-center text-sm text-muted-foreground">
               Esta serie no tiene valores en los registros actuales.
             </div>
           ) : (
@@ -266,20 +267,20 @@ export function RegistrosChart({ records }: { records: ClinicalRecord[] }) {
                 </defs>
                 <CartesianGrid
                   vertical={false}
-                  stroke="rgba(255,255,255,0.06)"
+                  stroke="rgba(15,18,28,0.08)"
                   strokeDasharray="0"
                 />
                 <XAxis
                   dataKey="recorded_at"
                   tickFormatter={formatAxisDate}
-                  tick={{ fill: "rgba(255,255,255,0.38)", fontSize: 11 }}
+                  tick={{ fill: "rgba(32,36,48,0.55)", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                   minTickGap={28}
                   interval="preserveStartEnd"
                 />
                 <YAxis
-                  tick={{ fill: "rgba(255,255,255,0.38)", fontSize: 11 }}
+                  tick={{ fill: "rgba(32,36,48,0.55)", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                   width={44}
@@ -287,7 +288,7 @@ export function RegistrosChart({ records }: { records: ClinicalRecord[] }) {
                 />
                 <Tooltip
                   cursor={{
-                    stroke: "rgba(255,255,255,0.16)",
+                    stroke: "rgba(15,18,28,0.22)",
                     strokeWidth: 1,
                     strokeDasharray: "4 4",
                   }}
@@ -306,29 +307,41 @@ export function RegistrosChart({ records }: { records: ClinicalRecord[] }) {
                   animationDuration={700}
                   animationEasing="ease-out"
                   dot={(props) => {
-                    const recordedAt = String(props.payload?.recorded_at ?? "");
+                    const { key, cx, cy, index, payload } = props as typeof props & {
+                      key?: Key;
+                      payload?: Record<string, string | number | null>;
+                    };
+                    const recordedAt = String(payload?.recorded_at ?? "");
+                    const dotKey = key ?? `dot-${serie.id}-${index}-${recordedAt}`;
                     if (
                       stats.latest == null ||
                       recordedAt !== stats.latest.recorded_at ||
-                      asNumber(props.payload?.[serie.id]) == null
+                      asNumber(payload?.[serie.id]) == null
                     ) {
-                      return null;
+                      return <g key={dotKey} />;
                     }
                     return (
                       <GlowDot
-                        cx={props.cx}
-                        cy={props.cy}
+                        key={dotKey}
+                        cx={cx}
+                        cy={cy}
                         color={serie.color}
                       />
                     );
                   }}
-                  activeDot={(props) => (
-                    <GlowDot
-                      cx={props.cx}
-                      cy={props.cy}
-                      color={serie.color}
-                    />
-                  )}
+                  activeDot={(props) => {
+                    const { key, cx, cy, index } = props as typeof props & {
+                      key?: Key;
+                    };
+                    return (
+                      <GlowDot
+                        key={key ?? `active-dot-${serie.id}-${index}`}
+                        cx={cx}
+                        cy={cy}
+                        color={serie.color}
+                      />
+                    );
+                  }}
                 />
               </AreaChart>
             </ResponsiveContainer>

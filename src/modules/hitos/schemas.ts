@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import {
   HITO_KINDS,
+  LUGAR_IOT_OPTIONS,
+  MOTIVO_IOT_OPTIONS,
   MOTIVO_TQT_OPTIONS,
   WEANING_RESULTS,
   hitoNeedsGsa,
@@ -11,8 +13,13 @@ import {
 export type HitoFormValues = {
   kind: HitoKind;
   occurred_at: string;
+  motivo_iot: string;
   motivo_tqt: string;
   motivo_otro: string;
+  lugar_iot: string;
+  intubacion_dificil: boolean;
+  reintubacion: boolean;
+  notes: string;
   weaning_result: string;
   pao2: string;
   paco2: string;
@@ -28,7 +35,7 @@ const GSA_RANGES = {
   hco3: { min: 0, max: 80, label: "HCO₃" },
   eb: { min: -50, max: 50, label: "EB" },
   fio2: { min: 21, max: 100, label: "FiO₂" },
-  lactato: { min: 0, max: 30, label: "Lactato" },
+  lactato: { min: 0, max: 30, label: "Ác. láctico" },
 } as const;
 
 export function parseOptionalNumber(value: string) {
@@ -95,8 +102,15 @@ export const hitoFormSchema = z
   .object({
     kind: z.enum(HITO_KINDS),
     occurred_at: z.string().trim().min(1, "Indica la fecha del hito."),
+    motivo_iot: z.string(),
     motivo_tqt: z.string(),
     motivo_otro: z.string(),
+    lugar_iot: z.string(),
+    intubacion_dificil: z.boolean(),
+    reintubacion: z.boolean(),
+    notes: z
+      .string()
+      .max(2000, "Las observaciones no pueden superar 2000 caracteres."),
     weaning_result: z.string(),
     pao2: z.string(),
     paco2: z.string(),
@@ -106,6 +120,20 @@ export const hitoFormSchema = z
     lactato: z.string(),
   })
   .superRefine((values, ctx) => {
+    if (values.kind === "iot") {
+      if (!(MOTIVO_IOT_OPTIONS as readonly string[]).includes(values.motivo_iot)) {
+        addIssue(ctx, "motivo_iot", "Selecciona el motivo de la IOT.");
+      } else if (values.motivo_iot === "Otro" && !values.motivo_otro.trim()) {
+        addIssue(ctx, "motivo_otro", "Describe el motivo de la IOT.");
+      }
+      if (
+        values.lugar_iot &&
+        !(LUGAR_IOT_OPTIONS as readonly string[]).includes(values.lugar_iot)
+      ) {
+        addIssue(ctx, "lugar_iot", "Selecciona el lugar de IOT.");
+      }
+    }
+
     if (values.kind === "tqt") {
       if (!(MOTIVO_TQT_OPTIONS as readonly string[]).includes(values.motivo_tqt)) {
         addIssue(ctx, "motivo_tqt", "Selecciona el motivo de la TQT.");

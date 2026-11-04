@@ -42,6 +42,23 @@ export const GRUPO_DIAGNOSTICO_OPTIONS = [
   "Ginecologico",
 ] as const;
 
+export const NACIONALIDAD_OPTIONS = [
+  "Chilena",
+  "Peruana",
+  "Boliviana",
+  "Venezolana",
+  "Haitiana",
+  "Colombiana",
+  "Argentina",
+  "Ecuatoriana",
+  "Brasileña",
+  "Paraguaya",
+  "Uruguaya",
+  "Española",
+  "China",
+  "Otra",
+] as const;
+
 export const patientFormSchema = z
   .object({
     id_rut: z
@@ -59,6 +76,7 @@ export const patientFormSchema = z
       .trim()
       .min(1, "Ingresa la fecha de nacimiento."),
     nacionalidad: optionalText,
+    talla: z.string(),
     diagnostico: z.string().trim().min(1, "Ingresa el diagnóstico principal."),
     grupo_diagnostico: z
       .string()
@@ -112,6 +130,18 @@ export const patientFormSchema = z
         path: ["fecha_egreso"],
         message: "Indica la fecha de egreso.",
       });
+    }
+
+    const talla = values.talla.trim().replace(",", ".");
+    if (talla) {
+      const parsed = Number(talla);
+      if (!Number.isFinite(parsed) || parsed < 100 || parsed > 230) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["talla"],
+          message: "La talla debe estar entre 100 y 230 cm.",
+        });
+      }
     }
   });
 

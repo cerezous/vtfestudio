@@ -8,7 +8,7 @@ import { ROUTES } from "@/shared/lib/constants";
 import { logError } from "@/shared/lib/logger";
 import { consumeRateLimit, resetRateLimit } from "@/shared/lib/rate-limit";
 import { createClient } from "@/shared/lib/supabase/server";
-import { mapAuthError } from "@/modules/auth/errors";
+import { getSupabaseEnv } from "@/shared/lib/supabase/env";
 import { normalizeLoginPassword } from "@/modules/auth/password";
 import { loginSchema, type LoginValues } from "@/modules/auth/schemas";
 import { loadStaffSession } from "@/modules/auth/session";
@@ -50,32 +50,61 @@ export async function signInAction(
     return { error: "Demasiados intentos. Espera unos minutos." };
   }
 
-  const supabase = await createClient();
-  const { data: email, error: lookupError } = await supabase.rpc(
-    "email_for_username",
-    { p_username: parsed.data.username },
-  );
+  const { url, key } = getSupabaseEnv();
+  let loginResponse: Response;
 
-  if (lookupError) {
-    logError("auth.login", lookupError);
+  try {
+    loginResponse = await fetch(`${url}/functions/v1/staff-login`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        apikey: key,
+        authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify({
+        username: parsed.data.username,
+        password: normalizeLoginPassword(parsed.data.password),
+      }),
+      signal: AbortSignal.timeout(12_000),
+    });
+  } catch (error) {
+    logError("auth.login", error);
     await waitAtLeast(startedAt, LOGIN_MIN_MS);
-    return { error: "Usuario o contraseña incorrectos." };
+    return { error: "No se pudo iniciar sesión. Intenta de nuevo." };
   }
 
-  if (!email) {
-    await waitAtLeast(startedAt, LOGIN_MIN_MS);
-    return { error: "Usuario o contraseña incorrectos." };
-  }
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password: normalizeLoginPassword(parsed.data.password),
-  });
+  const payload = (await loginResponse.json().catch(() => null)) as {
+    access_token?: string;
+    refresh_token?: string;
+  } | null;
 
   await waitAtLeast(startedAt, LOGIN_MIN_MS);
 
+  if (loginResponse.status === 429) {
+    return { error: "Demasiados intentos. Espera unos minutos." };
+  }
+
+  if (
+    !loginResponse.ok ||
+    !payload?.access_token ||
+    !payload.refresh_token
+  ) {
+    return {
+      error: loginResponse.status === 401
+        ? "Usuario o contraseña incorrectos."
+        : "No se pudo iniciar sesión. Intenta de nuevo.",
+    };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.setSession({
+    access_token: payload.access_token,
+    refresh_token: payload.refresh_token,
+  });
+
   if (error) {
-    return { error: mapAuthError(error.message) };
+    logError("auth.login", error);
+    return { error: "No se pudo iniciar sesión. Intenta de nuevo." };
   }
 
   resetRateLimit(limitKey);

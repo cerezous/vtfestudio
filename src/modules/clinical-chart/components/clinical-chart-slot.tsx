@@ -30,11 +30,11 @@ export function ClinicalChartSlot({
   return (
     <section
       className={cn(
-        "flex min-h-44 flex-col rounded-[1.4rem] border bg-card p-4 shadow-sm",
+        "dash-surface flex min-h-44 flex-col rounded-[1.6rem] p-5",
         className,
       )}
     >
-      <h3 className="text-sm font-semibold">{title}</h3>
+      <h3 className="text-lg font-semibold">{title}</h3>
       <div className="mt-4 min-h-24 flex-1">{children}</div>
     </section>
   );
@@ -49,7 +49,7 @@ export function ChartFact({
 }) {
   return (
     <div>
-      <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+      <p className="text-caption font-medium uppercase text-muted-foreground">
         {label}
       </p>
       <p className="mt-0.5 text-sm font-medium">{value || "—"}</p>

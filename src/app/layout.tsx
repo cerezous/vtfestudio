@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 
+import { ClearStaleServiceWorker } from "@/shared/components/clear-stale-service-worker";
 import { AppProviders } from "@/shared/providers/app-providers";
 import { APP_NAME, APP_TAGLINE } from "@/shared/lib/constants";
 
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: {
@@ -28,8 +22,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} min-h-svh font-sans antialiased`}
+        className="min-h-svh font-sans antialiased"
       >
+        <ClearStaleServiceWorker />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

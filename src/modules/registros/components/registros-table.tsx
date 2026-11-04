@@ -9,6 +9,7 @@ import {
   type RecordFieldId,
 } from "@/modules/registros/constants";
 import { asNumber, formatRecordNumber } from "@/modules/registros/model";
+import { flowPatternLabel, ventModeLabel } from "@/modules/registros/pb980";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/lib/utils";
 import type { ClinicalRecord } from "@/shared/types/database";
@@ -35,6 +36,12 @@ function fieldValue(record: ClinicalRecord, field: RecordFieldId) {
   if (field === "support") {
     return supportLabel(record.support);
   }
+  if (field === "vent_mode") {
+    return ventModeLabel(record.vent_mode) || "—";
+  }
+  if (field === "flow_pattern") {
+    return flowPatternLabel(record.flow_pattern) || "—";
+  }
   return formatRecordNumber(record[field]);
 }
 
@@ -55,7 +62,7 @@ export function RegistrosTable({
   );
 
   return (
-    <div className="overflow-x-auto rounded-[1.6rem] border bg-card shadow-sm">
+    <div className="dash-surface overflow-x-auto rounded-[1.6rem]">
       <table className="w-max min-w-full border-collapse text-sm">
         <thead>
           <tr className="border-b bg-muted/40">
@@ -68,7 +75,7 @@ export function RegistrosTable({
                 <th
                   key={record?.id ?? `empty-${index}`}
                   className={cn(
-                    "min-w-[6.4rem] border-l px-1.5 py-2 text-center align-bottom font-medium",
+                    "min-w-[7.25rem] border-l px-1.5 py-2 text-center align-bottom font-medium",
                     record
                       ? "cursor-pointer hover:bg-accent/70"
                       : "text-muted-foreground/50",
@@ -182,6 +189,7 @@ function GroupRows({
               key={record?.id ?? `${row.id}-empty-${index}`}
               className={cn(
                 "border-l px-1.5 py-2 text-center tabular-nums",
+                row.id === "vent_mode" && "text-[11px] leading-tight whitespace-normal",
                 record
                   ? "cursor-pointer hover:bg-muted/50"
                   : "text-muted-foreground/40",
@@ -195,7 +203,16 @@ function GroupRows({
               }}
             >
               {record ? (
-                row.id === "pafi" && asNumber(record.pafi) != null ? (
+                (row.id === "pafi" ||
+                  row.id === "iox" ||
+                  row.id === "driving_pressure" ||
+                  row.id === "cest") &&
+                asNumber(record[row.id]) != null ? (
+                  <span className="font-medium text-primary">
+                    {fieldValue(record, row.id)}
+                  </span>
+                ) : row.id === "vt_ml_kg_pi" &&
+                  asNumber(record.vt_ml_kg_pi) != null ? (
                   <span className="font-medium text-primary">
                     {fieldValue(record, row.id)}
                   </span>

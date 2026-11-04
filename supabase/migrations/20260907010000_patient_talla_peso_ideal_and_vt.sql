@@ -1,0 +1,3 @@
+-- Applied remotely via MCP as patient_talla_peso_ideal_and_vt.
+-- patients.talla / peso_ideal (PBW ARDSNet).
+-- clinical_records.vt / vt_ml_kg_pi (solo VMI).

@@ -1,6 +1,11 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
+import {
+  chipClass,
+  choiceRowClass,
+  fieldClass,
+} from "@/shared/components/ui/controls";
 import { cn } from "@/shared/lib/utils";
 import {
   AGE_BANDS,
@@ -15,9 +20,6 @@ import {
   type ChronicId,
 } from "@/modules/apache/scoring";
 
-const fieldClass =
-  "h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
-
 function CheckCard({
   checked,
   label,
@@ -31,16 +33,11 @@ function CheckCard({
 }) {
   return (
     <label
-      className={cn(
-        "flex cursor-pointer items-start gap-2 rounded-xl border px-3 py-2.5 text-sm",
-        checked
-          ? "border-primary bg-accent text-accent-foreground"
-          : "border-input bg-background",
-      )}
+      className={cn(choiceRowClass(checked), "items-start")}
     >
       <input
         type="checkbox"
-        className="mt-0.5 size-4 accent-[#2F6BFF]"
+        className="mt-0.5"
         checked={checked}
         onChange={onChange}
       />
@@ -91,7 +88,9 @@ export function ApacheForm({
       <div className="space-y-5">
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <p className="text-xs text-muted-foreground">Fecha del APACHE II *</p>
+            <p className="text-[13px] font-medium tracking-[-0.006em] text-[rgb(60_60_67/0.62)] dark:text-white/60">
+              Fecha del APACHE II *
+            </p>
             <input
               type="datetime-local"
               className={fieldClass}
@@ -107,7 +106,7 @@ export function ApacheForm({
           <CheckCard
             checked={state.fio2Ge50}
             label="FiO₂ ≥ 0.5"
-            hint="Activa la fila de AaDO₂. Si no, se usa PaO₂."
+            hint="FiO₂ ≥ 50 %: AaDO₂. Si no, PaO₂."
             onChange={() => onChange({ ...state, fio2Ge50: !state.fio2Ge50 })}
           />
           <CheckCard
@@ -190,10 +189,10 @@ export function ApacheForm({
                             disabled={oxygenInactive}
                             onClick={() => selectCell(param.id, cell.id)}
                             className={cn(
-                              "h-11 w-full rounded-lg border px-1 text-[11px] leading-tight transition",
+                              "apple-chip h-11 w-full rounded-[10px] px-1 text-[11px] leading-tight font-medium tracking-[-0.006em] transition-[transform,background-color,color,box-shadow] duration-100 ease-out active:scale-[0.97] disabled:opacity-40",
                               active
-                                ? "border-primary bg-primary font-semibold text-white shadow-sm"
-                                : "border-transparent bg-muted/40 text-foreground hover:border-primary/40 hover:bg-accent",
+                                ? "bg-primary font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.28)]"
+                                : "bg-[rgb(120_120_128/0.12)] text-foreground hover:bg-[rgb(120_120_128/0.18)]",
                             )}
                           >
                             {cell.label}
@@ -210,7 +209,7 @@ export function ApacheForm({
 
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Glasgow · 15 − GSC
+            Glasgow · 15 − GCS
           </p>
           <div className="flex flex-wrap gap-1.5">
             {GCS_VALUES.map((value) => {
@@ -220,12 +219,7 @@ export function ApacheForm({
                   key={value}
                   type="button"
                   onClick={() => onChange({ ...state, gcs: value })}
-                  className={cn(
-                    "min-w-11 rounded-xl border px-2.5 py-2 text-sm font-medium transition",
-                    active
-                      ? "border-primary bg-primary text-white"
-                      : "border-input bg-background hover:bg-accent",
-                  )}
+                  className={cn(chipClass(active, true), "min-w-11")}
                 >
                   {value}
                   <span
@@ -261,12 +255,7 @@ export function ApacheForm({
                   onClick={() =>
                     onChange({ ...state, ageBand: band.id as AgeBandId })
                   }
-                  className={cn(
-                    "rounded-xl border px-3 py-2 text-sm font-medium transition",
-                    active
-                      ? "border-primary bg-primary text-white"
-                      : "border-input bg-background hover:bg-accent",
-                  )}
+                  className={cn(chipClass(active, true), "w-full")}
                 >
                   {band.label}
                   <span

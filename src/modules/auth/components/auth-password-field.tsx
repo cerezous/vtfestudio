@@ -22,7 +22,7 @@ export function AuthPasswordField({
       <button
         type="button"
         onClick={() => setVisible((current) => !current)}
-        className="absolute inset-y-0 right-3 flex items-center rounded-full px-1 text-zinc-400 hover:text-zinc-600"
+        className="absolute inset-y-0 right-2 flex items-center rounded-full px-2 text-[rgb(60_60_67/0.45)] transition-transform duration-100 ease-out hover:text-foreground active:scale-95"
         aria-label={visible ? "Ocultar contraseña" : "Mostrar contraseña"}
       >
         {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}

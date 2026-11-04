@@ -4,23 +4,27 @@ import type { ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { computePesoIdeal, formatKg } from "@/modules/patients/anthropometry";
 import { formatExactAge, formatRutInput } from "@/modules/patients/display";
 import {
   ANTECEDENTES_OPTIONS,
   GRUPO_DIAGNOSTICO_OPTIONS,
-  MOTIVO_EGRESO_OPTIONS,
+  NACIONALIDAD_OPTIONS,
   parseAntecedentes,
   patientFormSchema,
   type PatientFormValues,
 } from "@/modules/patients/schemas";
 import { Button } from "@/shared/components/ui/button";
+import {
+  choiceRowClass,
+  computedFieldClass,
+  fieldClass,
+  selectClass,
+} from "@/shared/components/ui/controls";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { cn } from "@/shared/lib/utils";
 import type { Patient } from "@/shared/types/database";
-
-const fieldClass =
-  "h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-60";
 
 function Field({
   label,
@@ -37,7 +41,7 @@ function Field({
 }) {
   return (
     <div className={cn("space-y-1.5", className)}>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <Label>{label}</Label>
       {children}
       {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
@@ -58,6 +62,7 @@ export function patientToFormValues(patient?: Patient | null): PatientFormValues
         : "",
     fecha_nacimiento: patient?.fecha_nacimiento ?? "",
     nacionalidad: patient?.nacionalidad ?? "",
+    talla: patient?.talla == null ? "" : String(patient.talla),
     diagnostico: patient?.diagnostico ?? "",
     grupo_diagnostico: patient?.grupo_diagnostico ?? "",
     antecedentes: parseAntecedentes(patient?.antecedentes_morbidos),
@@ -70,14 +75,12 @@ export function patientToFormValues(patient?: Patient | null): PatientFormValues
 
 export function PatientForm({
   patient,
-  editing = false,
   pending,
   submitLabel,
   onSubmit,
   onCancel,
 }: {
   patient?: Patient | null;
-  editing?: boolean;
   pending: boolean;
   submitLabel: string;
   onSubmit: (values: PatientFormValues) => void;
@@ -89,7 +92,14 @@ export function PatientForm({
   });
 
   const birthDate = form.watch("fecha_nacimiento");
+  const sexo = form.watch("sexo");
+  const talla = form.watch("talla");
   const antecedentes = form.watch("antecedentes") ?? [];
+  const tallaParsed = Number(String(talla ?? "").trim().replace(",", "."));
+  const pesoIdeal = computePesoIdeal(
+    Number.isFinite(tallaParsed) ? tallaParsed : null,
+    sexo,
+  );
 
   function toggleAntecedente(option: string) {
     const current = form.getValues("antecedentes");
@@ -144,7 +154,7 @@ export function PatientForm({
           <Input className={fieldClass} {...form.register("apellido2")} />
         </Field>
         <Field label="Sexo">
-          <select className={cn(fieldClass, "bg-background")} {...form.register("sexo")}>
+          <select className={selectClass} {...form.register("sexo")}>
             <option value="">Sin dato</option>
             <option value="H">Hombre</option>
             <option value="M">Mujer</option>
@@ -165,18 +175,68 @@ export function PatientForm({
           <Input
             readOnly
             tabIndex={-1}
-            className={cn(fieldClass, "bg-muted/50")}
-            value={birthDate ? formatExactAge(birthDate) : "Se calcula con la fecha de nacimiento"}
+            className={computedFieldClass}
+            value={birthDate ? formatExactAge(birthDate) : "Según la fecha de nacimiento"}
           />
         </Field>
-        <Field label="Nacionalidad">
-          <Input className={fieldClass} {...form.register("nacionalidad")} />
+        <Field
+          label="Nacionalidad"
+          className="sm:col-span-2"
+          error={form.formState.errors.nacionalidad?.message}
+        >
+          <select
+            className={selectClass}
+            {...form.register("nacionalidad")}
+          >
+            <option value="">Sin dato</option>
+            {NACIONALIDAD_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+            {patient?.nacionalidad &&
+            !(NACIONALIDAD_OPTIONS as readonly string[]).includes(
+              patient.nacionalidad,
+            ) ? (
+              <option value={patient.nacionalidad}>
+                {patient.nacionalidad}
+              </option>
+            ) : null}
+          </select>
+        </Field>
+        <Field
+          label="Talla · cm"
+          hint="100 a 230"
+          error={form.formState.errors.talla?.message}
+        >
+          <Input
+            inputMode="decimal"
+            className={fieldClass}
+            {...form.register("talla")}
+          />
+        </Field>
+        <Field
+          label="Peso ideal"
+          hint="50/45,5 + 0,91 × (talla − 152,4)"
+        >
+          <Input
+            readOnly
+            tabIndex={-1}
+            className={computedFieldClass}
+            value={
+              pesoIdeal != null
+                ? formatKg(pesoIdeal)
+                : sexo === "H" || sexo === "M"
+                  ? "Según la talla"
+                  : "Falta sexo y talla"
+            }
+          />
         </Field>
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2">
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:col-span-2">
-          Estudio VMI
+          Hospitalización
         </p>
         <Field
           label="Diagnóstico principal *"
@@ -191,7 +251,7 @@ export function PatientForm({
           error={form.formState.errors.grupo_diagnostico?.message}
         >
           <select
-            className={cn(fieldClass, "bg-background")}
+            className={selectClass}
             {...form.register("grupo_diagnostico")}
           >
             <option value="">Selecciona</option>
@@ -203,25 +263,17 @@ export function PatientForm({
           </select>
         </Field>
         <div className="space-y-2 sm:col-span-2">
-          <Label className="text-xs text-muted-foreground">
-            Antecedentes mórbidos
-          </Label>
+          <Label>Antecedentes mórbidos</Label>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {ANTECEDENTES_OPTIONS.map((option) => {
               const checked = antecedentes.includes(option);
               return (
                 <label
                   key={option}
-                  className={cn(
-                    "flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm",
-                    checked
-                      ? "border-primary bg-accent text-accent-foreground"
-                      : "border-input bg-background",
-                  )}
+                  className={choiceRowClass(checked)}
                 >
                   <input
                     type="checkbox"
-                    className="size-4 accent-[#2F6BFF]"
                     checked={checked}
                     onChange={() => toggleAntecedente(option)}
                   />
@@ -251,36 +303,6 @@ export function PatientForm({
             {...form.register("fecha_ingreso_uci")}
           />
         </Field>
-        {editing ? (
-          <>
-            <Field
-              label="Fecha egreso"
-              error={form.formState.errors.fecha_egreso?.message}
-            >
-              <Input
-                type="date"
-                className={fieldClass}
-                {...form.register("fecha_egreso")}
-              />
-            </Field>
-            <Field
-              label="Motivo de egreso"
-              error={form.formState.errors.motivo_egreso?.message}
-            >
-              <select
-                className={cn(fieldClass, "bg-background")}
-                {...form.register("motivo_egreso")}
-              >
-                <option value="">Sin egreso</option>
-                {MOTIVO_EGRESO_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </Field>
-          </>
-        ) : null}
       </section>
 
       <div className="flex justify-end gap-2">

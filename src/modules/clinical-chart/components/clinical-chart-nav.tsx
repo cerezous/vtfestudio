@@ -5,13 +5,10 @@ import Link from "next/link";
 import type { ComponentType, MouseEvent } from "react";
 import {
   Activity,
-  ClipboardList,
   FileText,
-  Flag,
   HeartPulse,
   NotebookPen,
   UserRound,
-  Wind,
 } from "lucide-react";
 
 import { clinicalChartHref } from "@/modules/clinical-chart/href";
@@ -20,11 +17,8 @@ import { cn } from "@/shared/lib/utils";
 
 const SECTION_ICONS: Record<string, ComponentType<{ className?: string }>> = {
   "datos-personales": UserRound,
-  "datos-hospitalizacion": ClipboardList,
   "apache-ii": Activity,
-  "datos-vmi": Wind,
   registros: HeartPulse,
-  hitos: Flag,
   epicrisis: NotebookPen,
 };
 
@@ -58,7 +52,7 @@ function SectionLink({
   return (
     <Link
       href={clinicalChartHref(patientId, sectionId)}
-      prefetch
+      prefetch={false}
       scroll={false}
       title={minimized ? label : undefined}
       aria-label={label}
@@ -71,7 +65,7 @@ function SectionLink({
         onNavigate(sectionId);
       }}
       className={cn(
-        "flex items-center rounded-xl text-sm font-medium transition-colors",
+        "flex items-center rounded-xl text-sm font-semibold transition-[transform,background-color,color] duration-100 ease-out active:scale-[0.97]",
         minimized ? "size-10 justify-center" : "gap-2 px-2.5 py-2",
         active
           ? "bg-white text-primary shadow-sm"
@@ -136,14 +130,14 @@ export function ClinicalChartNav({
           }
         }}
         className={cn(
-          "fixed right-0 top-20 bottom-4 z-30 hidden flex-col overflow-hidden rounded-l-[1.6rem] bg-primary p-2 text-white shadow-lg lg:flex",
+          "fixed right-0 top-1/2 z-30 hidden -translate-y-1/2 flex-col overflow-hidden rounded-l-[1.6rem] bg-primary p-2 text-white shadow-lg lg:flex",
           "transition-[width] duration-200 ease-out",
           expanded ? "w-60" : "w-16",
         )}
       >
         <div
           className={cn(
-            "flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden transition-[gap] duration-200",
+            "flex flex-col overflow-x-hidden transition-[gap] duration-200",
             expanded ? "gap-3" : "gap-1",
           )}
         >
@@ -151,7 +145,7 @@ export function ClinicalChartNav({
             <div key={group.id}>
               <p
                 className={cn(
-                  "overflow-hidden text-[11px] font-medium uppercase tracking-wider text-white/60 transition-[max-height,opacity,padding] duration-150",
+                  "overflow-hidden text-caption font-medium uppercase text-white/60 transition-[max-height,opacity,padding] duration-150",
                   expanded
                     ? "max-h-8 px-2.5 pb-2 opacity-100"
                     : "max-h-0 px-0 pb-0 opacity-0",

@@ -24,10 +24,20 @@ export const SUPPORT_OPTIONS: { id: SupportId; label: string }[] = [
 
 export type RecordFieldId =
   | "support"
+  | "vent_mode"
   | "peep"
   | "pmva"
   | "driving_pressure"
   | "iox"
+  | "vt"
+  | "vt_ml_kg_pi"
+  | "fr"
+  | "pi"
+  | "ti"
+  | "ppeak"
+  | "pplat"
+  | "cest"
+  | "flow_pattern"
   | "ps"
   | "epap"
   | "flujo"
@@ -49,10 +59,20 @@ export type RecordRow = {
 
 export const VENTILATORY_ROWS: RecordRow[] = [
   { id: "support", label: "Soporte" },
+  { id: "vent_mode", label: "Modo" },
   { id: "peep", label: "PEEP", unit: "cmH₂O" },
+  { id: "pplat", label: "Pplat", unit: "cmH₂O" },
+  { id: "cest", label: "Cest", unit: "mL/cmH₂O" },
   { id: "pmva", label: "PmVA", unit: "cmH₂O" },
   { id: "driving_pressure", label: "Driving Pressure", unit: "cmH₂O" },
   { id: "iox", label: "IOX" },
+  { id: "vt", label: "Vt", unit: "mL" },
+  { id: "vt_ml_kg_pi", label: "ml/kg/PI" },
+  { id: "fr", label: "FR", unit: "rpm" },
+  { id: "pi", label: "PI", unit: "cmH₂O" },
+  { id: "ti", label: "Ti", unit: "s" },
+  { id: "ppeak", label: "Ppeak", unit: "cmH₂O" },
+  { id: "flow_pattern", label: "Patrón" },
   { id: "ps", label: "PS", unit: "cmH₂O" },
   { id: "epap", label: "EPAP", unit: "cmH₂O" },
   { id: "flujo", label: "Flujo", unit: "L/min" },
@@ -66,7 +86,7 @@ export const EXAM_ROWS: RecordRow[] = [
   { id: "eb", label: "EB", unit: "mEq/L" },
   { id: "pafi", label: "PaFi" },
   { id: "pcr", label: "PCR", unit: "mg/L" },
-  { id: "lactato", label: "Ác. láctico", unit: "mmol/L" },
+  { id: "lactato", label: "Ác. láctico", unit: "mg/dL" },
   { id: "procalcitonina", label: "Procalcitonina", unit: "ng/mL" },
 ];
 

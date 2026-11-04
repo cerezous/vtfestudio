@@ -36,7 +36,14 @@ export function PatientDialog({
 
   function handleSubmit(values: PatientFormValues) {
     upsertPatient.mutate(
-      { id: patient?.id, values },
+      {
+        id: patient?.id,
+        values: {
+          ...values,
+          fecha_egreso: patient?.fecha_egreso ?? null,
+          motivo_egreso: patient?.motivo_egreso ?? null,
+        },
+      },
       { onSuccess: () => {
           setOpen(false);
           onSaved?.();
@@ -60,14 +67,13 @@ export function PatientDialog({
             </DialogTitle>
             <DialogDescription>
               {editing
-                ? "Actualiza la ficha del estudio."
-                : "Identificación del paciente y datos del estudio VMI."}
+                ? "Actualiza la ficha."
+                : "Identificación y datos del estudio."}
             </DialogDescription>
           </DialogHeader>
           <PatientForm
             key={`${patient?.id ?? "new"}-${String(isOpen)}`}
             patient={patient}
-            editing={editing}
             pending={upsertPatient.isPending}
             submitLabel={editing ? "Guardar cambios" : "Crear paciente"}
             onSubmit={handleSubmit}

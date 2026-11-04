@@ -38,7 +38,7 @@ export function ClinicalChartHeader({ patient }: { patient: Patient }) {
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <ChartBackButton />
-          <h1 className="truncate text-2xl font-semibold tracking-tight">
+          <h1 className="truncate text-2xl font-semibold">
             {patientFullName(patient)}
           </h1>
         </div>
